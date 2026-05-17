@@ -17,37 +17,42 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{
-  --bg:#f7f7f5;--surface:#fff;--surface2:#f0f0ec;
-  --border:rgba(0,0,0,.07);--accent:#1a56db;--accent-light:#dbeafe;
-  --red:#dc2626;--text:#0f0f14;--muted:#9ca3af;--soft:#6b7280;
+  --bg:#f7f7f5;--surface:#fff;--surface2:#f0f0ec;--border:rgba(0,0,0,.07);
+  --accent:#1a56db;--accent-light:#dbeafe;--red:#dc2626;
+  --text:#0f0f14;--muted:#9ca3af;--soft:#6b7280;
   --shadow:0 2px 16px rgba(0,0,0,.08);--shadow-lg:0 8px 40px rgba(0,0,0,.14);
-  --spotify:#1DB954;--ytm:#FF0000;
+  --green:#16a34a;--orange:#ea580c;--spotify:#1DB954;--ytm:#FF0000;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--accent);line-height:1}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100}
+.logo-wrap{display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;border-radius:7px;flex-shrink:0}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent);line-height:1}
 .logo .dot{color:var(--red)}.logo .ar{color:var(--text)}
-.header-right{display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:6px}
 .mode-pills{display:flex;gap:5px}
-.pill{padding:6px 12px;border-radius:22px;border:1.5px solid var(--border);background:var(--surface2);color:var(--soft);font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:4px}
+.pill{padding:5px 10px;border-radius:22px;border:1.5px solid var(--border);background:var(--surface2);color:var(--soft);font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:4px}
 .pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.icon-btn{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s}
-.icon-btn:active{transform:scale(.92)}
+.icon-btn{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.icon-btn:active{transform:scale(.9)}
+
+/* ── TABS ── */
 .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.tab{flex:1;padding:9px 4px 8px;text-align:center;cursor:pointer;font-size:10px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;transition:all .18s;letter-spacing:.6px;text-transform:uppercase}
+.tab{flex:1;padding:8px 2px 7px;text-align:center;cursor:pointer;font-size:9px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;transition:all .18s;letter-spacing:.4px;text-transform:uppercase}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-icon{font-size:15px;display:block;margin-bottom:1px}
+.tab-icon{font-size:14px;display:block;margin-bottom:1px}
 .screen{display:none;flex:1;overflow:hidden;flex-direction:column}
 .screen.active{display:flex}
 
-/* MAP SCREEN */
+/* ══════════════ MAP SCREEN ══════════════ */
 .map-screen{position:relative;flex:1}
 #map{position:absolute;inset:0;z-index:0}
 .leaflet-container{background:#e8e8e4!important}
-
-/* WEATHER OVERLAY */
 #weatherOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+/* weather layers */
 .wlay-hot::before{content:'';position:absolute;top:0;left:0;right:0;height:130px;background:linear-gradient(to bottom,rgba(255,140,0,.13),transparent)}
 .wlay-cold::before{content:'';position:absolute;top:0;left:0;right:0;height:130px;background:linear-gradient(to bottom,rgba(100,180,255,.15),transparent)}
 .wlay-overcast::before{content:'';position:absolute;inset:0;background:rgba(140,140,150,.25)}
@@ -58,25 +63,28 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .rain-s{position:absolute;top:-60px;width:1.5px;background:linear-gradient(to bottom,transparent,rgba(160,200,255,.72),transparent);animation:fall linear infinite}
 @keyframes fall{from{transform:translateY(-60px) rotate(20deg)}to{transform:translateY(110vh) rotate(20deg)}}
 .snow-f{position:absolute;top:-10px;border-radius:50%;background:rgba(255,255,255,.88);animation:snow linear infinite;filter:blur(.5px)}
-@keyframes snow{0%{transform:translateY(-10px) translateX(0)}25%{transform:translateY(25vh) translateX(14px)}50%{transform:translateY(50vh) translateX(-10px)}75%{transform:translateY(75vh) translateX(12px)}100%{transform:translateY(110vh) translateX(-6px)}}
+@keyframes snow{0%{transform:translateY(-10px) translateX(0)}50%{transform:translateY(50vh) translateX(14px)}100%{transform:translateY(110vh) translateX(-6px)}}
 .storm-flash{position:absolute;inset:0;background:rgba(255,255,240,.48);opacity:0;animation:lightning 5s infinite}
 @keyframes lightning{0%,3%,7%,100%{opacity:0}1.5%,5%{opacity:1}}
-
-/* WEATHER BADGE */
+/* map UI elements */
 .weather-badge{position:absolute;top:12px;left:12px;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:6px 12px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);opacity:0;transition:opacity .4s}
 .weather-badge.show{opacity:1}
-.wb-icon{font-size:18px;line-height:1}
-.wb-info{}
-.wb-temp{font-size:15px;font-weight:700;line-height:1.1}
-.wb-desc{font-size:10px;color:var(--soft);font-weight:500}
-
-/* GPS TAG */
+.wb-icon{font-size:18px;line-height:1}.wb-temp{font-size:15px;font-weight:700;line-height:1.1}.wb-desc{font-size:10px;color:var(--soft);font-weight:500}
 .gps-tag{display:none;align-items:center;gap:6px;background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:11px;color:var(--soft);position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:20;white-space:nowrap;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
 .gps-tag.show{display:flex}
 .gps-pulse{width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-
-/* BOTTOM SHEET */
+.offline-badge{position:absolute;top:54px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(220,38,38,.9);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;display:none;align-items:center;gap:6px;white-space:nowrap;box-shadow:var(--shadow)}
+.offline-badge.show{display:flex}
+.traffic-btn{position:absolute;right:10px;top:50px;z-index:20;width:34px;height:34px;border-radius:8px;border:2px solid rgba(0,0,0,.15);background:var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s}
+.traffic-btn.on{background:var(--accent);border-color:var(--accent)}
+.traffic-legend{position:absolute;bottom:148px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;display:none;align-items:center;gap:8px;box-shadow:var(--shadow);white-space:nowrap}
+.traffic-legend.show{display:flex}
+.tl-dot{width:8px;height:8px;border-radius:50%}
+/* Music FAB */
+.music-fab{position:absolute;right:10px;bottom:150px;z-index:20;width:42px;height:42px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);box-shadow:var(--shadow-lg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .15s}
+.music-fab.playing{background:var(--accent);border-color:var(--accent)}
+.music-fab:active{transform:scale(.9)}
+/* Bottom sheet */
 .bottom-sheet{position:absolute;bottom:0;left:0;right:0;z-index:10;background:var(--surface);border-radius:24px 24px 0 0;box-shadow:0 -4px 32px rgba(0,0,0,.1);padding:10px 18px 24px}
 .idle-view{display:flex;flex-direction:column;gap:10px}
 .idle-hint{text-align:center;font-size:13px;color:var(--muted);font-weight:500}
@@ -91,8 +99,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .rec-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
 .rec-dot.on{background:var(--red);animation:blink 1.4s infinite}
 .rec-dot.paused{background:#f59e0b;animation:none}
+.wl-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;display:none}
+.wl-dot.on{display:block;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-/* BUTTONS */
+/* ── BUTTONS ── */
 .btn{height:52px;border-radius:14px;border:none;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-primary{background:var(--accent);color:#fff;flex:1}
 .btn-primary:active{transform:scale(.97);background:#1346c0}
@@ -100,161 +111,176 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .btn-secondary:active{transform:scale(.97)}
 .btn-danger{background:#fee2e2;color:var(--red);border:1.5px solid #fca5a5;flex:0 0 52px;border-radius:14px}
 .btn-danger:active{transform:scale(.97)}
-.btn-share{background:#dcfce7;color:#15803d;border:1.5px solid #86efac;flex:1}
+.btn-share{background:#dcfce7;color:var(--green);border:1.5px solid #86efac;flex:1}
 .btn-share:active{transform:scale(.97)}
 
-/* STATS SCREEN */
+/* ══════════════ STATS SCREEN ══════════════ */
 .stats-screen{overflow-y:auto;padding:16px;gap:12px;background:var(--bg)}
-.timer-hero{background:var(--accent);border-radius:20px;padding:20px;text-align:center;color:#fff}
-.timer-hero-val{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:4px;line-height:1}
-.timer-hero-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:4px}
+.timer-hero{background:var(--accent);border-radius:20px;padding:18px;text-align:center;color:#fff}
+.timer-hero-val{font-family:'Bebas Neue',sans-serif;font-size:60px;letter-spacing:4px;line-height:1}
+.timer-hero-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:2px}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:15px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px}
 .sc.wide{grid-column:span 2}
-.sc-icon{font-size:18px;margin-bottom:6px}
+.sc-icon{font-size:16px;margin-bottom:5px}
 .sc-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
-.sc-val{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1.05;color:var(--text);letter-spacing:.5px}
+.sc-val{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1.05;color:var(--text)}
 .sc-val.em{color:var(--accent)}
 .sc-unit{font-size:11px;color:var(--muted);margin-top:-2px}
 .pace-section{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
 .pace-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
 .pace-fill{height:100%;background:linear-gradient(90deg,var(--accent),#60a5fa);border-radius:3px;width:0%;transition:width .6s ease}
+/* Speed graph */
+.graph-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;grid-column:span 2}
+.graph-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.graph-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.graph-peak{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent)}
+#speedGraph{width:100%;height:80px;display:block;border-radius:8px}
 
-/* MUSIC SCREEN */
-.music-screen{overflow-y:auto;padding:16px;gap:12px;background:var(--bg)}
-.sec-lbl{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.app-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;text-decoration:none;color:var(--text);transition:all .15s;box-shadow:var(--shadow)}
-.app-card:active{transform:scale(.98)}
-.app-logo{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:#fff}
-.app-logo.sp{background:var(--spotify)}.app-logo.yt{background:var(--ytm)}
-.app-name{font-weight:700;font-size:15px}.app-desc{font-size:12px;color:var(--muted);margin-top:1px}
-.app-arrow{font-size:16px;color:var(--muted)}
-.local-player{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-.player-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.album{width:48px;height:48px;border-radius:10px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.song-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-artist{font-size:12px;color:var(--muted);margin-top:2px}
-.p-controls{display:flex;gap:8px;align-items:center;justify-content:center}
-.p-btn{width:40px;height:40px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.p-btn.play{width:52px;height:52px;background:var(--accent);color:#fff;font-size:19px}
-.p-btn:active{transform:scale(.9)}
-.prog-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;cursor:pointer;margin:12px 0 5px}
-.prog-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .3s linear}
-.prog-times{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
-.vol-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;color:var(--muted)}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--surface2);border-radius:2px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer}
-.upload-btn{display:block;width:100%;margin-top:12px;padding:10px;text-align:center;background:var(--surface2);border:1.5px dashed var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--soft);cursor:pointer}
+/* ══════════════ LOGROS SCREEN ══════════════ */
+.logros-screen{overflow-y:auto;padding:16px;gap:14px;background:var(--bg)}
+.logros-header{background:var(--accent);border-radius:20px;padding:18px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.lh-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px}
+.lh-count{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1}
+.lh-sub{font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase}
+.logros-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.logro-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px;display:flex;flex-direction:column;gap:4px;transition:all .2s;position:relative;overflow:hidden}
+.logro-card.unlocked{border-color:#86efac;background:#f0fdf4}
+.logro-card.unlocked::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)}
+.logro-icon{font-size:26px;line-height:1;margin-bottom:2px}
+.logro-name{font-weight:700;font-size:12px;line-height:1.3;color:var(--text)}
+.logro-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.logro-date{font-size:9px;color:var(--green);font-weight:700;margin-top:2px}
+.logro-locked{opacity:.35}
+.logro-lock{position:absolute;top:10px;right:10px;font-size:12px;opacity:.3}
 
-/* HISTORY SCREEN */
+/* ══════════════ HISTORIAL SCREEN ══════════════ */
 .history-screen{overflow-y:auto;padding:16px;gap:10px;background:var(--bg)}
-.hcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
-.hcard-icon{width:42px;height:42px;border-radius:11px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin:4px 0 8px}
+.hcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+.hcard-top{display:flex;align-items:center;gap:12px}
+.hcard-icon{width:40px;height:40px;border-radius:10px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
 .hcard-meta{flex:1;min-width:0}
-.hcard-title{font-weight:700;font-size:14px}
-.hcard-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
-.hcard-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.hcard-title{font-weight:700;font-size:13px}
+.hcard-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.hcard-right{text-align:right;flex-shrink:0}
 .hcard-km{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);line-height:1}
-.hcard-time{font-size:11px;color:var(--muted)}
-.share-btn-sm{font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;background:var(--accent-light);border:none;border-radius:8px;padding:4px 10px}
+.hcard-time{font-size:10px;color:var(--muted)}
+.hcard-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.hcard-btn{flex:1;height:34px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;color:var(--soft);transition:all .15s}
+.hcard-btn.blue{background:var(--accent-light);border-color:#93c5fd;color:var(--accent)}
+.hcard-btn:active{transform:scale(.96)}
+/* Friends section */
+.friend-import{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.fi-title{font-weight:700;font-size:13px;margin-bottom:4px}
+.fi-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
+.fi-row{display:flex;gap:8px}
+.fi-input{flex:1;height:42px;border:1.5px solid var(--border);border-radius:11px;background:var(--surface2);font-size:12px;padding:0 12px;outline:none;color:var(--text)}
+.fi-input:focus{border-color:var(--accent)}
+.fi-btn{height:42px;padding:0 16px;border:none;border-radius:11px;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer}
+.fcard{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.fcard-avatar{width:36px;height:36px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fcard-info{flex:1;min-width:0}
+.fcard-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcard-sub{font-size:10px;color:var(--muted)}
+.fcard-km{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange)}
+.fcard-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 0 0 6px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--muted)}
 .empty-state .ei{font-size:44px;opacity:.4}
 .empty-state p{font-size:13px;text-align:center;max-width:210px;line-height:1.6}
 
-/* MODALS */
+/* ══════════════ MODALS ══════════════ */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(2px)}
 .modal-backdrop.open{display:flex}
 .modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-height:88dvh;overflow-y:auto;padding:14px 20px 32px;animation:slideUp .28s cubic-bezier(.34,1.3,.64,1)}
 @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-handle{width:36px;height:4px;background:var(--surface2);border-radius:2px;margin:0 auto 18px}
-.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:18px}
-.sec-div{margin:18px 0 12px;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted)}
-
-/* Alert rows */
-.alert-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
-.alert-row:last-of-type{border-bottom:none}
-.alert-km-lbl{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);min-width:58px}
-.alert-desc{flex:1;font-size:13px;font-weight:500}
-.alert-desc small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.modal-handle{width:36px;height:4px;background:var(--surface2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:16px}
+.sec-div{margin:16px 0 10px;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted)}
+/* Settings rows */
+.cfg-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.cfg-row:last-of-type{border-bottom:none}
+.cfg-desc{flex:1;font-size:13px;font-weight:500}
+.cfg-desc small{display:block;font-size:11px;color:var(--muted);font-weight:400}
 .toggle{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-track{position:absolute;inset:0;background:var(--surface2);border-radius:12px;transition:.2s;border:1.5px solid var(--border)}
 .toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .toggle input:checked~.toggle-thumb{transform:translateX(20px)}
-.add-row{display:flex;gap:8px;margin-top:14px}
-.num-inp{flex:1;height:44px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:15px;padding:0 14px;outline:none;color:var(--text)}
+.alert-km-lbl{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);min-width:52px}
+.add-row{display:flex;gap:8px;margin-top:12px}
+.num-inp{flex:1;height:42px;border:1.5px solid var(--border);border-radius:11px;background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:14px;padding:0 12px;outline:none;color:var(--text)}
 .num-inp:focus{border-color:var(--accent)}
-.add-btn-sm{height:44px;padding:0 18px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer}
-
-/* Share card */
+.add-btn-sm{height:42px;padding:0 16px;border:none;border-radius:11px;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer}
+.key-inp{flex:1;height:42px;border:1.5px solid var(--border);border-radius:11px;background:var(--surface2);font-size:12px;padding:0 12px;outline:none;color:var(--text)}
+.key-inp:focus{border-color:var(--accent)}
+.key-link{font-size:11px;color:var(--accent);text-decoration:none}
+.time-inp{width:90px;height:42px;border:1.5px solid var(--border);border-radius:11px;background:var(--surface2);font-size:16px;font-weight:600;padding:0 10px;outline:none;color:var(--text);text-align:center}
+.time-inp:focus{border-color:var(--accent)}
+/* Share modal */
 #shareCanvas{width:100%;border-radius:14px;display:block;box-shadow:var(--shadow-lg)}
 .share-hint{display:flex;align-items:flex-start;gap:8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin:12px 0 0;font-size:12px;color:#1e40af;line-height:1.5}
 .share-primary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.sa-primary{height:74px;border-radius:16px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .15s;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden}
+.sa-primary{height:72px;border-radius:16px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .15s;font-family:'DM Sans',sans-serif}
 .sa-primary:active{transform:scale(.95)}
-.sa-primary .sa-icon{font-size:26px;line-height:1}
-.sa-primary .sa-name{font-size:13px;font-weight:700}
-.sa-primary .sa-sub{font-size:10px;opacity:.8;font-weight:500}
+.sa-primary .sa-icon{font-size:24px;line-height:1}.sa-primary .sa-name{font-size:13px;font-weight:700}.sa-primary .sa-sub{font-size:10px;opacity:.8;font-weight:500}
 .sa-wa{background:#25D366;color:#fff}
-.sa-ig{background:linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);color:#fff}
+.sa-ig{background:linear-gradient(135deg,#f09433 0%,#dc2743 50%,#bc1888 100%);color:#fff}
 .share-secondary{display:flex;gap:8px;margin-top:10px}
 .sa-sec{flex:1;height:44px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--soft);transition:all .15s;font-family:'DM Sans',sans-serif}
 .sa-sec:active{transform:scale(.96)}
 .sa-sec.all{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
-
-/* TRAFFIC button */
-.traffic-btn{position:absolute;right:10px;top:50px;z-index:20;width:34px;height:34px;border-radius:8px;border:2px solid rgba(0,0,0,.15);background:var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s}
-.traffic-btn.on{background:var(--accent);border-color:var(--accent)}
-.traffic-btn:active{transform:scale(.92)}
-/* traffic legend pill */
-.traffic-legend{position:absolute;bottom:140px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--text);display:none;align-items:center;gap:8px;box-shadow:var(--shadow);white-space:nowrap}
-.traffic-legend.show{display:flex}
-.tl-dot{width:8px;height:8px;border-radius:50%}
-
-/* API key form in settings */
-.key-inp{width:100%;height:44px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 14px;outline:none;color:var(--text);margin-top:8px}
-.key-inp:focus{border-color:var(--accent)}
-.key-row{display:flex;gap:8px;margin-top:8px}
-.key-save-btn{height:44px;padding:0 18px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;white-space:nowrap}
-.key-link{font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:5px}
-
-/* OFFLINE badge */
-.offline-badge{position:absolute;top:52px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(220,38,38,.9);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;display:none;align-items:center;gap:6px;backdrop-filter:blur(6px);box-shadow:var(--shadow);white-space:nowrap}
-.offline-badge.show{display:flex}
-
-/* WAKE LOCK indicator — tiny dot on rec-dot area */
-.wl-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;display:none}
-.wl-dot.on{display:block;animation:blink 2s infinite}
-
-/* INSTALL BANNER */
-.install-banner{position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--surface);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:18px 20px 28px;box-shadow:0 -8px 32px rgba(0,0,0,.12);transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.2,.64,1)}
+/* Music modal */
+.music-modal .app-card{display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;text-decoration:none;color:var(--text);transition:all .15s;margin-bottom:10px}
+.music-modal .app-card:active{transform:scale(.98)}
+.app-logo{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:#fff}
+.app-logo.sp{background:var(--spotify)}.app-logo.yt{background:var(--ytm)}
+.local-player{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.player-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.album{width:46px;height:46px;border-radius:10px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.song-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-artist{font-size:12px;color:var(--muted);margin-top:1px}
+.p-controls{display:flex;gap:8px;align-items:center;justify-content:center}
+.p-btn{width:38px;height:38px;border-radius:50%;border:none;background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.p-btn.play{width:50px;height:50px;background:var(--accent);color:#fff;font-size:18px}
+.p-btn:active{transform:scale(.9)}
+.prog-bar{height:3px;background:var(--surface);border-radius:2px;overflow:hidden;cursor:pointer;margin:10px 0 4px}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .3s linear}
+.prog-times{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.vol-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted)}
+input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--surface);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer}
+.upload-btn{display:block;width:100%;margin-top:10px;padding:9px;text-align:center;background:var(--surface);border:1.5px dashed var(--border);border-radius:10px;font-size:12px;font-weight:600;color:var(--soft);cursor:pointer}
+/* Install banner */
+.install-banner{position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--surface);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:16px 18px 26px;box-shadow:0 -8px 32px rgba(0,0,0,.12);transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.2,.64,1)}
 .install-banner.show{transform:translateY(0)}
-.ib-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.ib-icon{width:52px;height:52px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-.ib-icon canvas{width:52px;height:52px}
+.ib-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ib-icon{width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0}
 .ib-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;line-height:1}
 .ib-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .ib-btns{display:flex;gap:10px}
-.ib-install{flex:1;height:48px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;cursor:pointer;transition:all .15s}
+.ib-install{flex:1;height:46px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1.5px;cursor:pointer;transition:all .15s}
 .ib-install:active{transform:scale(.97)}
-.ib-dismiss{width:48px;height:48px;border-radius:13px;border:1.5px solid var(--border);background:var(--surface2);font-size:20px;cursor:pointer}
-
-/* MILESTONE overlay */
+.ib-dismiss{width:46px;height:46px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer}
+/* Milestone */
 .milestone{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:var(--accent);color:#fff;border-radius:20px;padding:20px 30px;text-align:center;z-index:9998;pointer-events:none;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--shadow-lg)}
 .milestone.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .ms-km{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1}
 .ms-lbl{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-top:2px}
-
-/* Flash */
+/* Logro unlocked popup */
+.logro-popup{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-30px);background:var(--surface);border:1.5px solid #86efac;border-radius:16px;padding:12px 18px;display:flex;align-items:center;gap:12px;z-index:9997;pointer-events:none;opacity:0;transition:all .4s cubic-bezier(.34,1.4,.64,1);box-shadow:var(--shadow-lg);white-space:nowrap}
+.logro-popup.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.lp-icon{font-size:26px}
+.lp-text{}
+.lp-title{font-weight:700;font-size:13px;color:var(--green)}
+.lp-name{font-size:12px;color:var(--text)}
+/* Flash + Toast */
 #alertFlash{position:fixed;inset:0;background:rgba(26,86,219,.14);z-index:150;pointer-events:none;opacity:0}
 #alertFlash.flash{animation:flashAnim .7s ease}
 @keyframes flashAnim{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
-
-/* Toast */
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--text);color:#fff;border-radius:12px;padding:10px 18px;font-size:13px;font-weight:500;z-index:9999;white-space:nowrap;transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--shadow-lg);pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
-
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px}
 </style>
@@ -263,11 +289,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 
 <!-- HEADER -->
 <header>
-  <div class="logo">PEDALE<span class="dot">.</span><span class="ar">AR</span></div>
+  <div class="logo-wrap">
+    <canvas class="logo-icon" id="headerIcon" width="28" height="28"></canvas>
+    <div class="logo">PEDALE<span class="dot">.</span><span class="ar">AR</span></div>
+  </div>
   <div class="header-right">
     <div class="mode-pills">
       <button class="pill active" id="pillBike" onclick="setMode('bike')">🚴 En Bici</button>
-      <button class="pill" id="pillRun" onclick="setMode('run')">🏃 A Pata</button>
+      <button class="pill" id="pillRun"  onclick="setMode('run')">🏃 A Pata</button>
     </div>
     <button class="icon-btn" onclick="openSettings()">⚙️</button>
   </div>
@@ -277,7 +306,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 <div class="tabs">
   <div class="tab active" onclick="showTab('map')"><span class="tab-icon">🗺️</span>Mapa</div>
   <div class="tab" onclick="showTab('stats')"><span class="tab-icon">📊</span>Stats</div>
-  <div class="tab" onclick="showTab('music')"><span class="tab-icon">🎵</span>Música</div>
+  <div class="tab" onclick="showTab('logros')"><span class="tab-icon">🏆</span>Logros</div>
   <div class="tab" onclick="showTab('history')"><span class="tab-icon">📋</span>Historial</div>
 </div>
 
@@ -285,32 +314,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 <div class="screen map-screen active" id="screen-map">
   <div id="map"></div>
   <div id="weatherOverlay"></div>
-
-  <!-- Traffic toggle button (stacks below zoom controls) -->
-  <button class="traffic-btn" id="trafficBtn" onclick="toggleTraffic()" title="Tránsito">🚦</button>
-
-  <!-- Traffic legend -->
+  <div class="weather-badge" id="weatherBadge">
+    <span class="wb-icon" id="wbIcon">🌤️</span>
+    <div><div class="wb-temp" id="wbTemp">--°C</div><div class="wb-desc" id="wbDesc">cargando…</div></div>
+  </div>
+  <div class="offline-badge" id="offlineBadge">📵 Sin conexión · mapa en caché</div>
+  <div class="gps-tag" id="gpsTag"><div class="gps-pulse"></div><span id="gpsTagText">Buscando GPS…</span></div>
+  <button class="traffic-btn" id="trafficBtn" onclick="toggleTraffic()">🚦</button>
   <div class="traffic-legend" id="trafficLegend">
     <div class="tl-dot" style="background:#00b300"></div>Fluido
     <div class="tl-dot" style="background:#ff9500"></div>Lento
     <div class="tl-dot" style="background:#cc0000"></div>Congestionado
   </div>
-  <!-- Offline badge -->
-  <div class="offline-badge" id="offlineBadge">📵 Sin conexión · mapa en caché</div>
-
-  <div class="weather-badge" id="weatherBadge">
-    <span class="wb-icon" id="wbIcon">🌤️</span>
-    <div class="wb-info"><div class="wb-temp" id="wbTemp">--°C</div><div class="wb-desc" id="wbDesc">cargando…</div></div>
-  </div>
-  <div class="gps-tag" id="gpsTag"><div class="gps-pulse"></div><span id="gpsTagText">Buscando GPS…</span></div>
+  <button class="music-fab" id="musicFab" onclick="openModal('musicModal')">🎵</button>
   <div class="bottom-sheet">
-    <div style="width:36px;height:4px;background:var(--surface2);border-radius:2px;margin:0 auto 14px"></div>
-    <!-- IDLE -->
+    <div style="width:36px;height:4px;background:var(--surface2);border-radius:2px;margin:0 auto 13px"></div>
     <div class="idle-view" id="idleView">
       <div class="idle-hint" id="idleHint">Listo para salir en bici 🚴</div>
       <button class="btn btn-primary" onclick="startActivity()">▶ &nbsp;INICIAR</button>
     </div>
-    <!-- ACTIVE -->
     <div class="active-view" id="activeView">
       <div class="live-metrics">
         <div class="live-metric"><div class="lm-val" id="lmTime">00:00</div><div class="lm-lbl">Tiempo</div></div>
@@ -319,7 +341,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       </div>
       <div class="active-controls">
         <div class="rec-dot on" id="recDot"></div>
-        <div class="wl-dot" id="wlDot" title="Pantalla activa"></div>
+        <div class="wl-dot" id="wlDot"></div>
         <button class="btn btn-secondary" id="btnPause" onclick="pauseActivity()">⏸ &nbsp;PAUSA</button>
         <button class="btn btn-share" onclick="shareCurrentActivity()">↗ SHARE</button>
         <button class="btn btn-danger" onclick="stopActivity()">⏹</button>
@@ -343,48 +365,41 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       </div>
       <div class="pace-track"><div class="pace-fill" id="paceFill"></div></div>
     </div>
+    <div class="graph-card">
+      <div class="graph-title">
+        <div class="graph-label">📈 Velocidad en el tiempo</div>
+        <div class="graph-peak" id="graphPeak">--</div>
+      </div>
+      <canvas id="speedGraph"></canvas>
+    </div>
     <div class="sc wide"><div class="sc-icon">🏔️</div><div class="sc-lbl">Altitud</div><div style="display:flex;align-items:baseline;gap:6px"><div class="sc-val" id="statAlt">--</div><div class="sc-unit" style="font-size:14px">metros</div></div></div>
   </div>
 </div>
 
-<!-- MUSIC SCREEN -->
-<div class="screen music-screen" id="screen-music">
-  <p class="sec-lbl">Abrir en</p>
-  <a class="app-card" href="https://open.spotify.com" target="_blank">
-    <div class="app-logo sp">🎵</div>
-    <div style="flex:1"><div class="app-name">Spotify</div><div class="app-desc">Abre tu playlist y pedaleá</div></div>
-    <div class="app-arrow">→</div>
-  </a>
-  <a class="app-card" href="https://music.youtube.com" target="_blank">
-    <div class="app-logo yt">▶</div>
-    <div style="flex:1"><div class="app-name">YouTube Music</div><div class="app-desc">Millones de canciones, gratis</div></div>
-    <div class="app-arrow">→</div>
-  </a>
-  <div style="margin-top:4px"></div>
-  <p class="sec-lbl">Reproductor local</p>
-  <div class="local-player">
-    <div class="player-top">
-      <div class="album" id="albumArt">🎵</div>
-      <div style="flex:1;min-width:0"><div class="song-name" id="songTitle">Sin pista cargada</div><div class="song-artist" id="songArtist">Subí un MP3 abajo</div></div>
-    </div>
-    <div class="p-controls">
-      <button class="p-btn" onclick="prevSong()">⏮</button>
-      <button class="p-btn" onclick="seekBack()">⏪</button>
-      <button class="p-btn play" id="playBtn" onclick="togglePlay()">▶</button>
-      <button class="p-btn" onclick="seekFwd()">⏩</button>
-      <button class="p-btn" onclick="nextSong()">⏭</button>
-    </div>
-    <div class="prog-bar" onclick="seekTo(event)"><div class="prog-fill" id="progFill"></div></div>
-    <div class="prog-times"><span id="tNow">0:00</span><span id="tTot">0:00</span></div>
-    <div class="vol-row"><span>🔈</span><input type="range" min="0" max="100" value="80" id="volSlider" oninput="setVol(this.value)"><span>🔊</span></div>
-    <label class="upload-btn">📂 Subir archivos de audio<input type="file" accept="audio/*" multiple style="display:none" onchange="loadFiles(this)"></label>
+<!-- LOGROS SCREEN -->
+<div class="screen logros-screen" id="screen-logros">
+  <div class="logros-header">
+    <div><div class="lh-title">🏆 Tus logros</div><div class="lh-sub">¡Seguí pedaleando!</div></div>
+    <div style="text-align:right"><div class="lh-count" id="logrosCount">0</div><div class="lh-sub" id="logrosSub">de 20 desbloqueados</div></div>
   </div>
+  <div class="logros-grid" id="logrosGrid"></div>
 </div>
 
-<!-- HISTORY SCREEN -->
+<!-- HISTORIAL SCREEN -->
 <div class="screen history-screen" id="screen-history">
+  <div class="sec-title">👥 Rutas de amigos</div>
+  <div class="friend-import">
+    <div class="fi-title">Importar ruta</div>
+    <div class="fi-sub">Pegá el código que te compartió un amigo</div>
+    <div class="fi-row">
+      <input class="fi-input" id="friendCode" placeholder="Pegá el código acá…" type="text">
+      <button class="fi-btn" onclick="importFriend()">CARGAR</button>
+    </div>
+  </div>
+  <div id="friendsList" style="display:flex;flex-direction:column;gap:8px;margin-top:2px"></div>
+  <div class="sec-title" style="margin-top:8px">📋 Mis actividades</div>
   <div id="histList" style="display:flex;flex-direction:column;gap:10px;flex:1"></div>
-  <div class="empty-state" id="emptyHist"><div class="ei">🚴</div><p>Todavía no hay actividades. ¡Salí a pedalear o a correr!</p></div>
+  <div class="empty-state" id="emptyHist"><div class="ei">🚴</div><p>Todavía no hay actividades. ¡Salí a pedalear!</p></div>
 </div>
 
 <!-- SETTINGS MODAL -->
@@ -393,34 +408,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="modal-handle"></div>
     <div class="modal-title">⚙️ Configuración</div>
     <div class="sec-div">🚦 Tránsito en tiempo real</div>
-    <div style="font-size:12px;color:var(--soft);line-height:1.6;margin-bottom:4px">
-      Usamos <strong>TomTom Traffic</strong> para mostrar el flujo de tránsito sobre el mapa.
-      Creá tu cuenta gratis en <a class="key-link" href="https://developer.tomtom.com" target="_blank">developer.tomtom.com</a> y pegá tu API key acá:
+    <div style="font-size:12px;color:var(--soft);line-height:1.6;margin-bottom:6px">Usamos TomTom Traffic. Creá tu cuenta gratis en <a class="key-link" href="https://developer.tomtom.com" target="_blank">developer.tomtom.com</a></div>
+    <div class="add-row">
+      <input class="key-inp" id="tomtomKey" type="text" placeholder="TomTom API key">
+      <button class="add-btn-sm" onclick="saveTrafficKey()">GUARDAR</button>
     </div>
-    <div class="key-row">
-      <input class="key-inp" id="tomtomKey" type="text" placeholder="Pegá tu TomTom API key" style="flex:1;margin-top:0">
-      <button class="key-save-btn" onclick="saveTrafficKey()">GUARDAR</button>
+    <div class="sec-div">🔔 Recordatorio diario</div>
+    <div class="cfg-row">
+      <div class="cfg-desc">Avisame para salir a pedalear<small>Notificación en el teléfono</small></div>
+      <label class="toggle"><input type="checkbox" id="notifToggle" onchange="toggleNotif(this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:6px">Plan gratuito: 2.500 pedidos/día · sin tarjeta de crédito</div>
-
+    <div class="cfg-row" id="notifTimeRow" style="display:none">
+      <div class="cfg-desc">Hora del recordatorio</div>
+      <input class="time-inp" type="time" id="notifTime" value="07:00" onchange="saveNotifTime(this.value)">
+    </div>
     <div class="sec-div">🎯 Avisos de distancia</div>
     <div id="alertList"></div>
     <div class="add-row">
-      <input class="num-inp" type="number" id="newAlertKm" placeholder="ej. 15 km" min="0.1" max="300" step="0.1">
+      <input class="num-inp" id="newAlertKm" type="number" placeholder="ej. 15 km" min="0.1" max="300" step="0.1">
       <button class="add-btn-sm" onclick="addAlert()">+ AGREGAR</button>
     </div>
     <div class="sec-div">🔔 Tipo de aviso</div>
-    <div class="alert-row">
-      <div class="alert-desc">Vibración<small>Al completar cada distancia programada</small></div>
-      <label class="toggle"><input type="checkbox" id="vibToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-    </div>
-    <div class="alert-row">
-      <div class="alert-desc">Sonido (beep)<small>Triple pitido al llegar a la meta</small></div>
-      <label class="toggle"><input type="checkbox" id="soundToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-    </div>
-    <div style="margin-top:20px">
-      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeModal('settingsModal')">✓ &nbsp;LISTO</button>
-    </div>
+    <div class="cfg-row"><div class="cfg-desc">Vibración<small>Al completar cada distancia</small></div><label class="toggle"><input type="checkbox" id="vibToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="cfg-row"><div class="cfg-desc">Sonido (beep)<small>Triple pitido al llegar</small></div><label class="toggle"><input type="checkbox" id="soundToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div style="margin-top:18px"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeModal('settingsModal')">✓ &nbsp;LISTO</button></div>
   </div>
 </div>
 
@@ -429,98 +440,116 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">↗ Compartir actividad</div>
-
-    <!-- Card preview -->
     <canvas id="shareCanvas" width="600" height="340"></canvas>
-
-    <!-- Instrucción -->
-    <div class="share-hint">
-      💡 <span>Se abre el menú de Android. Elegí <strong>WhatsApp → Estado</strong> o <strong>Instagram → Historias</strong>.</span>
-    </div>
-
-    <!-- Botones principales grandes -->
+    <div class="share-hint">💡 <span>Se abre el menú de Android. Elegí <strong>WhatsApp → Estado</strong> o <strong>Instagram → Historias</strong>.</span></div>
     <div class="share-primary">
-      <button class="sa-primary sa-wa" onclick="shareImageNative('whatsapp')">
-        <span class="sa-icon">💬</span>
-        <span class="sa-name">WhatsApp</span>
-        <span class="sa-sub">Estado</span>
-      </button>
-      <button class="sa-primary sa-ig" onclick="shareImageNative('instagram')">
-        <span class="sa-icon">📸</span>
-        <span class="sa-name">Instagram</span>
-        <span class="sa-sub">Historias</span>
-      </button>
+      <button class="sa-primary sa-wa" onclick="shareImageNative('whatsapp')"><span class="sa-icon">💬</span><span class="sa-name">WhatsApp</span><span class="sa-sub">Estado</span></button>
+      <button class="sa-primary sa-ig" onclick="shareImageNative('instagram')"><span class="sa-icon">📸</span><span class="sa-name">Instagram</span><span class="sa-sub">Historias</span></button>
     </div>
-
-    <!-- Secundarios -->
     <div class="share-secondary">
       <button class="sa-sec all" onclick="shareImageNative('all')">↗ Todas las apps</button>
-      <button class="sa-sec" onclick="downloadCard()">💾 Guardar imagen</button>
-      <button class="sa-sec" onclick="copyText()">📋 Copiar texto</button>
+      <button class="sa-sec" onclick="downloadCard()">💾 Guardar</button>
+      <button class="sa-sec" onclick="copyText()">📋 Copiar</button>
     </div>
   </div>
 </div>
 
-<!-- INSTALL BANNER -->
+<!-- MUSIC MODAL -->
+<div class="modal-backdrop" id="musicModal" onclick="closeModal('musicModal')">
+  <div class="modal music-modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎵 Música</div>
+    <a class="app-card" href="https://open.spotify.com" target="_blank">
+      <div class="app-logo sp">🎵</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:15px">Spotify</div><div style="font-size:12px;color:var(--muted)">Abrí tu playlist y pedaleá</div></div>
+      <div style="color:var(--muted)">→</div>
+    </a>
+    <a class="app-card" href="https://music.youtube.com" target="_blank">
+      <div class="app-logo yt">▶</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:15px">YouTube Music</div><div style="font-size:12px;color:var(--muted)">Millones de canciones, gratis</div></div>
+      <div style="color:var(--muted)">→</div>
+    </a>
+    <div class="local-player">
+      <div class="player-top">
+        <div class="album" id="albumArt">🎵</div>
+        <div style="flex:1;min-width:0"><div class="song-name" id="songTitle">Sin pista cargada</div><div class="song-artist" id="songArtist">Subí un MP3 abajo</div></div>
+      </div>
+      <div class="p-controls">
+        <button class="p-btn" onclick="prevSong()">⏮</button>
+        <button class="p-btn" onclick="seekBack()">⏪</button>
+        <button class="p-btn play" id="playBtn" onclick="togglePlay()">▶</button>
+        <button class="p-btn" onclick="seekFwd()">⏩</button>
+        <button class="p-btn" onclick="nextSong()">⏭</button>
+      </div>
+      <div class="prog-bar" onclick="seekTo(event)"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-times"><span id="tNow">0:00</span><span id="tTot">0:00</span></div>
+      <div class="vol-row"><span>🔈</span><input type="range" min="0" max="100" value="80" id="volSlider" oninput="setVol(this.value)"><span>🔊</span></div>
+      <label class="upload-btn">📂 Subir archivos de audio<input type="file" accept="audio/*" multiple style="display:none" onchange="loadFiles(this)"></label>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAYS -->
+<div class="milestone" id="milestone"><div class="ms-km" id="msKm">5 km</div><div class="ms-lbl">¡Meta alcanzada! 🎉</div></div>
+<div class="logro-popup" id="logroPopup"><span class="lp-icon" id="lpIcon">🏅</span><div class="lp-text"><div class="lp-title">¡Logro desbloqueado!</div><div class="lp-name" id="lpName">—</div></div></div>
 <div class="install-banner" id="installBanner">
   <div class="ib-row">
-    <div class="ib-icon"><canvas id="ibCanvas" width="52" height="52"></canvas></div>
-    <div>
-      <div class="ib-title">PEDALE<span style="color:var(--red)">.</span>AR</div>
-      <div class="ib-sub">Agregala a tu pantalla de inicio · gratis</div>
-    </div>
+    <div class="ib-icon"><canvas id="ibCanvas" width="48" height="48"></canvas></div>
+    <div><div class="ib-title">PEDALE<span style="color:var(--red)">.</span>AR</div><div class="ib-sub">Agregala a tu pantalla de inicio · gratis</div></div>
   </div>
   <div class="ib-btns">
     <button class="ib-install" onclick="installApp()">📲 &nbsp;INSTALAR</button>
     <button class="ib-dismiss" onclick="dismissInstall()">✕</button>
   </div>
 </div>
-
-<!-- MILESTONE -->
-<div class="milestone" id="milestone"><div class="ms-km" id="msKm">5 km</div><div class="ms-lbl">¡Meta alcanzada! 🎉</div></div>
 <div id="alertFlash"></div>
 <div class="toast" id="toast"></div>
 <audio id="audioEl"></audio>
 
 <script>
+// ════════════════════════════════
 // STATE
-let map,userMarker,routeLine,accCircle;
-let watchId=null,isRecording=false,isPaused=false,activityMode='bike';
-let routeCoords=[],startTime=null,pausedTime=0,pauseStart=null;
-let timerInterval=null,totalDist=0,maxSpeed=0,speedSamples=[],lastPos=null,currentAlt=null;
-let historyData=JSON.parse(localStorage.getItem('pedaleHistory')||'[]');
-let currentShareRecord=null,firedAlerts=new Set(),currentPos=null;
+// ════════════════════════════════
+let map, userMarker, routeLine, accCircle, friendLayers=[];
+let watchId=null, isRecording=false, isPaused=false, activityMode='bike';
+let routeCoords=[], speedLog=[], startTime=null, pausedTime=0, pauseStart=null;
+let timerInterval=null, totalDist=0, maxSpeed=0, speedSamples=[], lastPos=null, currentAlt=null;
+let historyData = JSON.parse(localStorage.getItem('pedaleHistory')||'[]');
+let friendsData  = JSON.parse(localStorage.getItem('pedaleFriends')||'[]');
+let achievements = JSON.parse(localStorage.getItem('pedaleAchievements')||'{}');
+let currentShareRecord=null, _cachedBlob=null, firedAlerts=new Set(), currentPos=null;
+let wakeLock=null, trafficLayer=null, trafficOn=false;
+let audioPlaying=false, playlist=[], curTrack=0, progInt=null;
 
+// ════════════════════════════════
 // DISTANCE ALERTS
+// ════════════════════════════════
 let distAlerts=JSON.parse(localStorage.getItem('pedaleAlerts')||JSON.stringify([
   {km:1,enabled:true,label:'Primera vuelta'},
-  {km:5,enabled:true,label:'5 kilómetros'},
-  {km:10,enabled:true,label:'10 kilómetros'},
-  {km:20,enabled:false,label:'20 kilómetros'},
-  {km:42.195,enabled:false,label:'Maratón completo 🏅'}
+  {km:5,enabled:true,label:'5 km'},
+  {km:10,enabled:true,label:'10 km'},
+  {km:20,enabled:false,label:'20 km'},
+  {km:42.195,enabled:false,label:'¡Maratón! 🏅'}
 ]));
 function saveAlerts(){localStorage.setItem('pedaleAlerts',JSON.stringify(distAlerts));}
 function renderAlertList(){
-  const el=document.getElementById('alertList');
-  el.innerHTML='';
+  const el=document.getElementById('alertList');el.innerHTML='';
   [...distAlerts].sort((a,b)=>a.km-b.km).forEach((a,i)=>{
     const idx=distAlerts.indexOf(a);
-    const row=document.createElement('div');row.className='alert-row';
-    row.innerHTML=`<div class="alert-km-lbl">${a.km<10?a.km.toFixed(1):a.km}<span style="font-size:11px;color:var(--muted)"> km</span></div>
-      <div class="alert-desc">${a.label}<small>${a.enabled?'✅ Activo':'⏸ Inactivo'}</small></div>
+    const row=document.createElement('div');row.className='cfg-row';
+    row.innerHTML=`<div class="alert-km-lbl">${a.km<10?a.km.toFixed(1):a.km}<span style="font-size:10px;color:var(--muted)"> km</span></div>
+      <div class="cfg-desc">${a.label}<small>${a.enabled?'✅ Activo':'⏸ Inactivo'}</small></div>
       <label class="toggle"><input type="checkbox" ${a.enabled?'checked':''} onchange="toggleAlert(${idx},this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-      <button style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding-left:8px" onclick="removeAlert(${idx})">✕</button>`;
+      <button style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;padding-left:6px" onclick="removeAlert(${idx})">✕</button>`;
     el.appendChild(row);
   });
 }
 function toggleAlert(i,v){distAlerts[i].enabled=v;saveAlerts();renderAlertList();}
 function removeAlert(i){distAlerts.splice(i,1);saveAlerts();renderAlertList();}
 function addAlert(){
-  const inp=document.getElementById('newAlertKm');
-  const km=parseFloat(inp.value);
+  const inp=document.getElementById('newAlertKm');const km=parseFloat(inp.value);
   if(!km||km<=0){showToast('⚠️ Ingresá una distancia válida');return;}
-  distAlerts.push({km,enabled:true,label:`${km} km`});
-  saveAlerts();renderAlertList();inp.value='';
+  distAlerts.push({km,enabled:true,label:`${km} km`});saveAlerts();renderAlertList();inp.value='';
   showToast(`✅ Aviso en ${km} km agregado`);
 }
 function checkDistanceAlerts(dist){
@@ -531,29 +560,22 @@ function checkDistanceAlerts(dist){
 function triggerMilestone(km){
   if(document.getElementById('soundToggle').checked)playBeep();
   if(document.getElementById('vibToggle').checked&&navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
-  const f=document.getElementById('alertFlash');f.classList.add('flash');setTimeout(()=>f.classList.remove('flash'),800);
+  document.getElementById('alertFlash').classList.add('flash');setTimeout(()=>document.getElementById('alertFlash').classList.remove('flash'),800);
   document.getElementById('msKm').textContent=`${km<10?km.toFixed(1):km} km`;
   const m=document.getElementById('milestone');m.classList.add('show');setTimeout(()=>m.classList.remove('show'),2800);
 }
 function playBeep(){
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [880,1100,1320].forEach((f,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
-      const t=ctx.currentTime+i*.18;
-      g.gain.setValueAtTime(.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.15);
-      o.start(t);o.stop(t+.2);
-    });
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [880,1100,1320].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';const t=ctx.currentTime+i*.18;g.gain.setValueAtTime(.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.15);o.start(t);o.stop(t+.2);});
   }catch(e){}
 }
 
+// ════════════════════════════════
 // WEATHER
+// ════════════════════════════════
 const WMO={
-  0:{icon:'☀️',desc:'Cielo despejado',ov:'clear'},
-  1:{icon:'🌤️',desc:'Mayormente claro',ov:'clear'},
-  2:{icon:'⛅',desc:'Parcialmente nublado',ov:'cloudy'},
-  3:{icon:'☁️',desc:'Cubierto',ov:'overcast'},
+  0:{icon:'☀️',desc:'Cielo despejado',ov:'clear'},1:{icon:'🌤️',desc:'Mayormente claro',ov:'clear'},
+  2:{icon:'⛅',desc:'Parcialmente nublado',ov:'cloudy'},3:{icon:'☁️',desc:'Cubierto',ov:'overcast'},
   45:{icon:'🌫️',desc:'Niebla',ov:'fog'},48:{icon:'🌫️',desc:'Niebla',ov:'fog'},
   51:{icon:'🌦️',desc:'Llovizna leve',ov:'rain'},53:{icon:'🌦️',desc:'Llovizna',ov:'rain'},55:{icon:'🌧️',desc:'Llovizna intensa',ov:'rain'},
   61:{icon:'🌧️',desc:'Lluvia leve',ov:'rain'},63:{icon:'🌧️',desc:'Lluvia moderada',ov:'rain'},65:{icon:'🌧️',desc:'Lluvia intensa',ov:'rain'},
@@ -567,7 +589,7 @@ async function fetchWeather(lat,lng){
     const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&current=weather_code,temperature_2m,apparent_temperature&timezone=auto`);
     const d=await r.json();
     applyWeather(d.current.weather_code,Math.round(d.current.temperature_2m),Math.round(d.current.apparent_temperature));
-  }catch(e){console.log('weather fail',e);}
+  }catch(e){}
 }
 function applyWeather(code,temp,feel){
   const w=WMO[code]||{icon:'🌤️',desc:'Variable',ov:'clear'};
@@ -578,45 +600,35 @@ function applyWeather(code,temp,feel){
   let type=w.ov;
   if(type==='clear'&&temp>=35)type='hot';
   if(type==='clear'&&temp<=4)type='cold';
-  buildWeatherOverlay(type);
+  buildOverlay(type);
 }
-function buildWeatherOverlay(type){
-  const el=document.getElementById('weatherOverlay');
-  el.innerHTML='';el.className='';
-  if(type==='hot'){el.className='wlay-hot';}
-  else if(type==='cold'){el.className='wlay-cold';}
+function buildOverlay(type){
+  const el=document.getElementById('weatherOverlay');el.innerHTML='';el.className='';
+  if(type==='hot')el.className='wlay-hot';
+  else if(type==='cold')el.className='wlay-cold';
   else if(type==='cloudy'){
-    el.className='';
-    [[8,5,'200px','90px',18],[28,38,'160px','72px',24],[52,12,'230px','100px',20],[68,55,'185px','82px',26]].forEach(([top,left,w,h,dur])=>{
+    [[8,5,200,90,18],[28,38,160,72,24],[52,12,230,100,20],[68,55,185,82,26]].forEach(([t,l,w,h,dur])=>{
       const c=document.createElement('div');c.className='cloud';
-      c.style.cssText=`top:${top}%;left:${left}%;width:${w};height:${h};animation-duration:${dur}s`;
-      el.appendChild(c);
+      c.style.cssText=`top:${t}%;left:${l}%;width:${w}px;height:${h}px;animation-duration:${dur}s`;el.appendChild(c);
     });
   }
-  else if(type==='overcast'){el.className='wlay-overcast';}
+  else if(type==='overcast')el.className='wlay-overcast';
   else if(type==='rain'||type==='storm'){
-    el.className=type==='storm'?'wlay-rain':'wlay-rain';
-    const count=type==='storm'?55:35;
-    for(let i=0;i<count;i++){
-      const s=document.createElement('div');s.className='rain-s';
-      const h=Math.random()*65+28;
-      s.style.cssText=`left:${Math.random()*110-5}%;height:${h}px;animation-duration:${Math.random()*.45+(type==='storm'?.3:.5)}s;animation-delay:${Math.random()*1.5}s;opacity:${Math.random()*.4+.4}`;
-      el.appendChild(s);
-    }
+    el.className='wlay-rain';const cnt=type==='storm'?55:35;
+    for(let i=0;i<cnt;i++){const s=document.createElement('div');s.className='rain-s';const h=Math.random()*65+28;
+      s.style.cssText=`left:${Math.random()*110-5}%;height:${h}px;animation-duration:${Math.random()*.45+(type==='storm'?.3:.5)}s;animation-delay:${Math.random()*1.5}s;opacity:${Math.random()*.4+.4}`;el.appendChild(s);}
     if(type==='storm'){const f=document.createElement('div');f.className='storm-flash';el.appendChild(f);}
   }
   else if(type==='snow'){
-    for(let i=0;i<30;i++){
-      const f=document.createElement('div');f.className='snow-f';
-      const sz=Math.random()*5+3;
-      f.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;animation-duration:${Math.random()*3+3}s;animation-delay:${Math.random()*4}s;opacity:${Math.random()*.5+.5}`;
-      el.appendChild(f);
-    }
+    for(let i=0;i<30;i++){const f=document.createElement('div');f.className='snow-f';const sz=Math.random()*5+3;
+      f.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;animation-duration:${Math.random()*3+3}s;animation-delay:${Math.random()*4}s;opacity:${Math.random()*.5+.5}`;el.appendChild(f);}
   }
-  else if(type==='fog'){el.className='wlay-fog';}
+  else if(type==='fog')el.className='wlay-fog';
 }
 
+// ════════════════════════════════
 // MAP
+// ════════════════════════════════
 function initMap(){
   map=L.map('map',{center:[-31.65,-60.7],zoom:15,zoomControl:false,attributionControl:false});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'}).addTo(map);
@@ -642,32 +654,31 @@ function placeMarker(lat,lng,acc){
   else accCircle=L.circle([lat,lng],{radius:acc||8,color:'rgba(26,86,219,.28)',fillColor:'rgba(26,86,219,.06)',fillOpacity:1,weight:1}).addTo(map);
 }
 
+// ════════════════════════════════
 // ACTIVITY
+// ════════════════════════════════
 function startActivity(){
   if(!navigator.geolocation){showToast('⚠️ GPS no disponible');return;}
   isRecording=true;isPaused=false;startTime=Date.now();pausedTime=0;
-  routeCoords=[];totalDist=0;maxSpeed=0;speedSamples=[];lastPos=null;firedAlerts.clear();
+  routeCoords=[];speedLog=[];totalDist=0;maxSpeed=0;speedSamples=[];lastPos=null;firedAlerts.clear();
   routeLine.setLatLngs([]);
   document.getElementById('idleView').style.display='none';
   document.getElementById('activeView').style.display='flex';
   document.getElementById('recDot').className='rec-dot on';
-  startWatch();startTimer();
-  acquireWakeLock();
+  startWatch();startTimer();acquireWakeLock();
   showToast(activityMode==='bike'?'🚴 ¡A pedalear!':'🏃 ¡A correr!');
 }
 function pauseActivity(){
   if(!isPaused){
     isPaused=true;pauseStart=Date.now();
     if(watchId){navigator.geolocation.clearWatch(watchId);watchId=null;}
-    clearInterval(timerInterval);
+    clearInterval(timerInterval);releaseWakeLock();
     document.getElementById('btnPause').innerHTML='▶ &nbsp;SEGUIR';
     document.getElementById('recDot').className='rec-dot paused';
-    releaseWakeLock();
     showToast('⏸ Pausado');
   }else{
     isPaused=false;pausedTime+=Date.now()-pauseStart;
-    startWatch();startTimer();
-    acquireWakeLock();
+    startWatch();startTimer();acquireWakeLock();
     document.getElementById('btnPause').innerHTML='⏸ &nbsp;PAUSA';
     document.getElementById('recDot').className='rec-dot on';
     showToast('▶ Continuando');
@@ -677,24 +688,43 @@ function stopActivity(){
   clearInterval(timerInterval);
   if(watchId){navigator.geolocation.clearWatch(watchId);watchId=null;}
   releaseWakeLock();
-  const elapsed=getElapsed(),avg=speedSamples.length?speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length:0;
-  const pace=avg>.5?60/avg:null,cal=estimateCal(totalDist,elapsed);
-  const rec={id:Date.now(),mode:activityMode,date:new Date().toLocaleDateString('es-AR'),
+  const elapsed=getElapsed();
+  const avg=speedSamples.length?speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length:0;
+  const pace=avg>.5?60/avg:null;
+  const cal=estimateCal(totalDist,elapsed);
+  // Downsample coords for storage (max 300 pts)
+  const coords=downsample(routeCoords,300);
+  const slog=downsampleLog(speedLog,150);
+  const rec={
+    id:Date.now(),mode:activityMode,
+    date:new Date().toLocaleDateString('es-AR'),
     time:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
-    dist:totalDist.toFixed(2),duration:formatTime(elapsed),avgSpeed:avg.toFixed(1),maxSpeed:maxSpeed.toFixed(1),
-    pace:pace?`${Math.floor(pace)}:${String(Math.round((pace%1)*60)).padStart(2,'0')}`:'--:--',cal,
-    weather:document.getElementById('wbDesc').textContent};
-  historyData.unshift(rec);localStorage.setItem('pedaleHistory',JSON.stringify(historyData));
-  renderHistory();isRecording=false;
+    dist:totalDist.toFixed(2),duration:formatTime(elapsed),
+    avgSpeed:avg.toFixed(1),maxSpeed:maxSpeed.toFixed(1),
+    pace:pace?`${Math.floor(pace)}:${String(Math.round((pace%1)*60)).padStart(2,'0')}`:'--:--',
+    cal,coords,speedLog:slog,
+    weather:document.getElementById('wbDesc').textContent
+  };
+  historyData.unshift(rec);
+  try{localStorage.setItem('pedaleHistory',JSON.stringify(historyData));}catch(e){
+    // Storage full — remove oldest to make room
+    historyData=historyData.slice(0,20);
+    historyData.forEach(r=>{r.coords=downsample(r.coords||[],100);r.speedLog=downsample(r.speedLog||[],50);});
+    localStorage.setItem('pedaleHistory',JSON.stringify(historyData));
+  }
+  checkAchievements(rec);
+  renderHistory();resetUI();
+  currentShareRecord=rec;
+  showToast(`✅ ${rec.dist} km · ${rec.duration}`);
+  setTimeout(()=>openShareModal(rec),700);
+}
+function resetUI(){
+  isRecording=false;
   document.getElementById('idleView').style.display='flex';
   document.getElementById('activeView').style.display='none';
   document.getElementById('recDot').className='rec-dot';
   document.getElementById('btnPause').innerHTML='⏸ &nbsp;PAUSA';
-  document.getElementById('lmTime').textContent='00:00';
-  document.getElementById('lmSpeed').textContent='0.0';
-  document.getElementById('lmDist').textContent='0.00';
-  currentShareRecord=rec;showToast(`✅ ${rec.dist} km · ${rec.duration}`);
-  setTimeout(()=>openShareModal(rec),700);
+  ['lmTime','lmSpeed','lmDist'].forEach((id,i)=>document.getElementById(id).textContent=i===0?'00:00':i===1?'0.0':'0.00');
 }
 function startWatch(){
   watchId=navigator.geolocation.watchPosition(onPos,()=>showGpsTag('GPS débil…'),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});
@@ -708,12 +738,15 @@ function onPos(pos){
     if(lastPos)totalDist+=haversine(lastPos[0],lastPos[1],lat,lng);
     lastPos=[lat,lng];routeCoords.push([lat,lng]);routeLine.setLatLngs(routeCoords);
     if(kmh>0){speedSamples.push(kmh);if(kmh>maxSpeed)maxSpeed=kmh;}
+    // Speed log (one entry per GPS update, max 1 per 5s to save memory)
+    const t=Math.floor(getElapsed());
+    if(!speedLog.length||t-speedLog[speedLog.length-1].t>=5) speedLog.push({t,v:parseFloat(kmh.toFixed(1))});
     updateStats(kmh);checkDistanceAlerts(totalDist);hideGpsTag();
   }
 }
 function updateStats(kmh){
   const elapsed=getElapsed(),avg=speedSamples.length?speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length:0;
-  const paceAvg=avg>.5?60/avg:null,cal=estimateCal(totalDist,elapsed);
+  const paceAvg=avg>.5?60/avg:null;const cal=estimateCal(totalDist,elapsed);
   const fmt=(v,d=1)=>v.toFixed(d),fmtP=p=>p?`${Math.floor(p)}:${String(Math.round((p%1)*60)).padStart(2,'0')}`:'--:--';
   document.getElementById('lmSpeed').textContent=fmt(kmh);
   document.getElementById('lmDist').textContent=fmt(totalDist,2);
@@ -725,6 +758,7 @@ function updateStats(kmh){
   document.getElementById('statCal').textContent=cal;
   document.getElementById('statAlt').textContent=currentAlt!=null?currentAlt:'--';
   document.getElementById('paceFill').style.width=Math.min(100,(kmh/(activityMode==='bike'?40:15))*100)+'%';
+  drawSpeedGraph(speedLog,maxSpeed);
 }
 function startTimer(){
   clearInterval(timerInterval);
@@ -738,181 +772,350 @@ function getElapsed(){return startTime?(Date.now()-startTime-pausedTime)/1000:0;
 function formatTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60);return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function haversine(la1,lo1,la2,lo2){const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function estimateCal(km,secs){return Math.round((activityMode==='bike'?8:9.8)*70*(secs/3600));}
+function downsample(arr,max){if(!arr||arr.length<=max)return arr||[];const step=Math.ceil(arr.length/max);return arr.filter((_,i)=>i%step===0);}
+function downsampleLog(log,max){if(!log||log.length<=max)return log||[];const step=Math.ceil(log.length/max);return log.filter((_,i)=>i%step===0);}
 
+// ════════════════════════════════
+// SPEED GRAPH
+// ════════════════════════════════
+function drawSpeedGraph(log,peak){
+  const canvas=document.getElementById('speedGraph');
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth||300,H=80;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  if(!log||log.length<2){
+    ctx.fillStyle='#f0f0ec';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#9ca3af';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Iniciá una actividad para ver el gráfico',W/2,H/2+4);
+    return;
+  }
+  const maxV=(peak||Math.max(...log.map(p=>p.v)))*1.15||20;
+  const maxT=log[log.length-1].t||1;
+  // BG
+  ctx.fillStyle='#f7f7f5';ctx.fillRect(0,0,W,H);
+  // Grid lines
+  ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=1;
+  [0.25,0.5,0.75,1].forEach(r=>{const y=H-(r*H*.85+H*.05);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();});
+  // Gradient fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(26,86,219,.25)');grad.addColorStop(1,'rgba(26,86,219,.02)');
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  log.forEach((p,i)=>{
+    const x=(p.t/maxT)*W,y=H-((p.v/maxV)*H*.85+H*.05);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.lineTo((log[log.length-1].t/maxT)*W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+  // Line
+  ctx.strokeStyle='#1a56db';ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();
+  log.forEach((p,i)=>{
+    const x=(p.t/maxT)*W,y=H-((p.v/maxV)*H*.85+H*.05);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Peak label
+  document.getElementById('graphPeak').textContent=`${(peak||0).toFixed(1)} km/h máx`;
+}
+
+// ════════════════════════════════
+// ACHIEVEMENTS / LOGROS
+// ════════════════════════════════
+const LOGROS=[
+  {id:'primer_km',    ico:'📍',nom:'Primer kilómetro',    desc:'Completaste tu primer km',              check:(s,r)=>s.totalKm>=1},
+  {id:'primera_bici', ico:'🚴',nom:'Primera bicicleteada',desc:'Primera actividad en bici',             check:(s,r)=>s.bikeRides>=1},
+  {id:'primera_pata', ico:'🏃',nom:'Primera corridita',   desc:'Primera actividad corriendo',           check:(s,r)=>s.runRides>=1},
+  {id:'km10',         ico:'🛣️',nom:'10 km de un tirón',   desc:'10 km en una sola salida',             check:(s,r)=>parseFloat(r?.dist||0)>=10},
+  {id:'km25',         ico:'🚀',nom:'25 km de un tirón',   desc:'25 km en una sola salida',             check:(s,r)=>parseFloat(r?.dist||0)>=25},
+  {id:'total50',      ico:'🏅',nom:'50 km totales',        desc:'50 km acumulados',                     check:(s)=>s.totalKm>=50},
+  {id:'total100',     ico:'💯',nom:'100 km totales',       desc:'¡Centenario de kilómetros!',            check:(s)=>s.totalKm>=100},
+  {id:'total500',     ico:'⭐',nom:'500 km totales',       desc:'Leyenda del asfalto',                  check:(s)=>s.totalKm>=500},
+  {id:'vel30',        ico:'⚡',nom:'Velocista',            desc:'Superaste los 30 km/h',                check:(s,r)=>parseFloat(r?.maxSpeed||0)>=30},
+  {id:'vel40',        ico:'💨',nom:'Cohete',               desc:'Superaste los 40 km/h',                check:(s,r)=>parseFloat(r?.maxSpeed||0)>=40},
+  {id:'streak3',      ico:'🔥',nom:'En racha',             desc:'3 días consecutivos',                  check:(s)=>s.streak>=3},
+  {id:'streak7',      ico:'🌟',nom:'Semana completa',      desc:'7 días seguidos',                      check:(s)=>s.streak>=7},
+  {id:'lluvia',       ico:'🌧️',nom:'Aguantador',           desc:'Saliste con lluvia',                   check:(s,r)=>r?.weather&&/lluvia|llovizna|tormenta|chubascos/i.test(r.weather)},
+  {id:'nieve',        ico:'❄️',nom:'Polar',                desc:'Saliste con nieve o nevada',           check:(s,r)=>r?.weather&&/nieve|nevada/i.test(r.weather)},
+  {id:'calor',        ico:'🌡️',nom:'Resistencia al calor', desc:'Saliste con más de 35°C',             check:(s,r)=>r?.weather&&/3[5-9]°|4\d°/i.test(r.weather)},
+  {id:'madrugador',   ico:'🌅',nom:'Madrugador',           desc:'Saliste antes de las 7am',             check:(s,r)=>r&&parseInt(r.time?.split(':')[0])<7},
+  {id:'noctambulo',   ico:'🌙',nom:'Noctámbulo',           desc:'Saliste después de las 9pm',           check:(s,r)=>r&&parseInt(r.time?.split(':')[0])>=21},
+  {id:'hora',         ico:'⏱️',nom:'Una hora',             desc:'Más de 1 hora sin parar',              check:(s,r)=>r&&parseInt(r.duration?.split(':')[0])>=1},
+  {id:'versatil',     ico:'🎯',nom:'Versátil',             desc:'Hiciste bici Y carrera',               check:(s)=>s.bikeRides>=1&&s.runRides>=1},
+  {id:'actividades10',ico:'🏆',nom:'10 actividades',        desc:'Completaste 10 salidas',               check:(s)=>s.totalRides>=10},
+];
+
+function computeStats(){
+  const recs=historyData;
+  const totalKm=recs.reduce((s,r)=>s+parseFloat(r.dist||0),0);
+  const totalRides=recs.length;
+  const bikeRides=recs.filter(r=>r.mode==='bike').length;
+  const runRides=recs.filter(r=>r.mode==='run').length;
+  const streak=computeStreak(recs);
+  return{totalKm,totalRides,bikeRides,runRides,streak};
+}
+function computeStreak(recs){
+  if(!recs.length)return 0;
+  const dates=[...new Set(recs.map(r=>r.date))].map(d=>{const[dd,mm,yy]=d.split('/');return new Date(yy,mm-1,dd).getTime();}).sort((a,b)=>b-a);
+  let streak=1;
+  for(let i=1;i<dates.length;i++){
+    if((dates[i-1]-dates[i])/(864e5)===1)streak++;else break;
+  }
+  return streak;
+}
+function checkAchievements(rec){
+  const stats=computeStats();
+  const newlyUnlocked=[];
+  LOGROS.forEach(l=>{
+    if(!achievements[l.id]){
+      try{if(l.check(stats,rec)){achievements[l.id]=new Date().toLocaleDateString('es-AR');newlyUnlocked.push(l);}}catch(e){}
+    }
+  });
+  if(newlyUnlocked.length){
+    localStorage.setItem('pedaleAchievements',JSON.stringify(achievements));
+    newlyUnlocked.forEach((l,i)=>setTimeout(()=>showLogroPopup(l),i*1800));
+    renderLogros();
+  }
+}
+function showLogroPopup(l){
+  document.getElementById('lpIcon').textContent=l.ico;
+  document.getElementById('lpName').textContent=l.nom;
+  const p=document.getElementById('logroPopup');
+  p.classList.add('show');setTimeout(()=>p.classList.remove('show'),2600);
+}
+function renderLogros(){
+  const grid=document.getElementById('logrosGrid');grid.innerHTML='';
+  const unlocked=Object.keys(achievements).length;
+  document.getElementById('logrosCount').textContent=unlocked;
+  document.getElementById('logrosSub').textContent=`de ${LOGROS.length} desbloqueados`;
+  LOGROS.forEach(l=>{
+    const ok=!!achievements[l.id];
+    const card=document.createElement('div');
+    card.className='logro-card'+(ok?' unlocked':' logro-locked');
+    card.innerHTML=`<div class="logro-icon">${ok?l.ico:'🔒'}</div>
+      <div class="logro-name">${l.nom}</div>
+      <div class="logro-desc">${l.desc}</div>
+      ${ok?`<div class="logro-date">✅ ${achievements[l.id]}</div>`:''}
+      ${!ok?'<div class="logro-lock">🔒</div>':''}`;
+    grid.appendChild(card);
+  });
+}
+
+// ════════════════════════════════
+// FRIENDS — exportar/importar rutas
+// ════════════════════════════════
+function exportRoute(rec){
+  const data={
+    n: rec.mode==='bike'?'Amigo en Bici':'Amigo Corriendo',
+    m: rec.mode, d: rec.dist, dur: rec.duration,
+    dt: rec.date, t: rec.time,
+    avg: rec.avgSpeed, max: rec.maxSpeed, cal: rec.cal,
+    c: downsample(rec.coords||[],120),
+    w: (rec.weather||'').split('·')[0].trim()
+  };
+  const code=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  // Copy + share
+  const txt=`🚴 PEDALE.AR — Ruta compartida\n${data.n} · ${data.dt}\n📍 ${data.d} km · ⏱ ${data.dur}\n\nCódigo de ruta:\n${code}`;
+  if(navigator.share){navigator.share({title:'Mi ruta en PEDALE.AR',text:txt}).catch(()=>{});}
+  else{navigator.clipboard?.writeText(txt);showToast('📋 Código copiado');}
+}
+function importFriend(){
+  const raw=document.getElementById('friendCode').value.trim();
+  if(!raw){showToast('⚠️ Pegá un código primero');return;}
+  try{
+    const data=JSON.parse(decodeURIComponent(escape(atob(raw))));
+    // Store
+    data.id=Date.now();
+    friendsData.unshift(data);
+    localStorage.setItem('pedaleFriends',JSON.stringify(friendsData));
+    document.getElementById('friendCode').value='';
+    renderHistory();
+    showToast(`✅ Ruta de amigo cargada · ${data.d} km`);
+    // Show on map
+    if(data.c&&data.c.length>1){
+      showTab('map');
+      const fl=L.polyline(data.c,{color:'#ea580c',weight:3.5,opacity:.8,dashArray:'8,4',lineJoin:'round'}).addTo(map);
+      friendLayers.push(fl);map.fitBounds(fl.getBounds(),{padding:[40,40]});
+    }
+  }catch(e){showToast('⚠️ Código inválido');}
+}
+function deleteFriend(id){
+  friendsData=friendsData.filter(f=>f.id!==id);
+  localStorage.setItem('pedaleFriends',JSON.stringify(friendsData));
+  renderHistory();
+}
+
+// ════════════════════════════════
+// SHOW ROUTE ON MAP (history)
+// ════════════════════════════════
+function showRouteOnMap(rec){
+  if(!rec.coords||rec.coords.length<2){showToast('⚠️ Esta actividad no tiene ruta guardada');return;}
+  showTab('map');
+  // Remove previous "replay" layers
+  if(window._replayLayer){map.removeLayer(window._replayLayer);}
+  window._replayLayer=L.polyline(rec.coords,{color:'#7c3aed',weight:4,opacity:.85,lineJoin:'round'}).addTo(map);
+  map.fitBounds(window._replayLayer.getBounds(),{padding:[40,40]});
+  showToast(`🗺️ Ruta del ${rec.date} · ${rec.dist} km`);
+}
+
+// ════════════════════════════════
+// PUSH NOTIFICATIONS
+// ════════════════════════════════
+function toggleNotif(checked){
+  document.getElementById('notifTimeRow').style.display=checked?'flex':'none';
+  if(checked){
+    if(Notification.permission==='default'){
+      Notification.requestPermission().then(p=>{
+        if(p!=='granted'){document.getElementById('notifToggle').checked=false;document.getElementById('notifTimeRow').style.display='none';showToast('⚠️ Permiso de notificaciones denegado');return;}
+        localStorage.setItem('notifEnabled','1');scheduleNotif();
+      });
+    }else if(Notification.permission==='granted'){localStorage.setItem('notifEnabled','1');scheduleNotif();}
+    else{document.getElementById('notifToggle').checked=false;showToast('⚠️ Permiso denegado en ajustes del sistema');}
+  }else{localStorage.removeItem('notifEnabled');showToast('🔕 Recordatorio desactivado');}
+}
+function saveNotifTime(val){localStorage.setItem('notifTime',val);scheduleNotif();showToast(`⏰ Recordatorio guardado: ${val}`);}
+function scheduleNotif(){
+  if(localStorage.getItem('notifEnabled')!=='1')return;
+  if(Notification.permission!=='granted')return;
+  const time=localStorage.getItem('notifTime')||'07:00';
+  const[h,m]=time.split(':').map(Number);
+  const now=new Date();const next=new Date();
+  next.setHours(h,m,0,0);if(next<=now)next.setDate(next.getDate()+1);
+  const ms=next-now;
+  clearTimeout(window._notifTimer);
+  window._notifTimer=setTimeout(()=>{
+    new Notification('PEDALE.AR 🚴',{body:'¡Es hora de salir a pedalear!',icon:document.getElementById('appleIcon')?.href||''});
+    scheduleNotif();
+  },ms);
+}
+function initNotifUI(){
+  const enabled=localStorage.getItem('notifEnabled')==='1';
+  document.getElementById('notifToggle').checked=enabled;
+  document.getElementById('notifTimeRow').style.display=enabled?'flex':'none';
+  const time=localStorage.getItem('notifTime')||'07:00';
+  document.getElementById('notifTime').value=time;
+  if(enabled&&Notification.permission==='granted')scheduleNotif();
+}
+
+// ════════════════════════════════
+// TRAFFIC
+// ════════════════════════════════
+function saveTrafficKey(){
+  const key=document.getElementById('tomtomKey').value.trim();
+  if(!key){showToast('⚠️ Ingresá una API key válida');return;}
+  localStorage.setItem('tomtomKey',key);showToast('✅ API key guardada');
+  if(trafficOn){removeTrafficLayer();addTrafficLayer();}
+}
+function addTrafficLayer(){
+  const key=localStorage.getItem('tomtomKey');
+  if(!key){showToast('⚠️ Configurá tu TomTom API key en ⚙️');openSettings();return false;}
+  trafficLayer=L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/flow/relative0-dark/{z}/{x}/{y}.png?key=${key}&tileSize=256`,{maxZoom:19,opacity:.75}).addTo(map);
+  return true;
+}
+function removeTrafficLayer(){if(trafficLayer){map.removeLayer(trafficLayer);trafficLayer=null;}}
+function toggleTraffic(){
+  if(trafficOn){removeTrafficLayer();trafficOn=false;document.getElementById('trafficBtn').classList.remove('on');document.getElementById('trafficLegend').classList.remove('show');localStorage.setItem('trafficWasOn','0');showToast('🚦 Tránsito desactivado');}
+  else{const ok=addTrafficLayer();if(ok){trafficOn=true;document.getElementById('trafficBtn').classList.add('on');document.getElementById('trafficLegend').classList.add('show');localStorage.setItem('trafficWasOn','1');showToast('🚦 Tránsito activado');}}
+}
+
+// ════════════════════════════════
 // SHARE
-let _cachedBlob = null; // pre-cached image blob
-
+// ════════════════════════════════
 function shareCurrentActivity(){
   const elapsed=getElapsed(),avg=speedSamples.length?speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length:0;
   openShareModal({mode:activityMode,dist:totalDist.toFixed(2),duration:formatTime(elapsed),
     avgSpeed:avg.toFixed(1),maxSpeed:maxSpeed.toFixed(1),cal:estimateCal(totalDist,elapsed),
-    date:new Date().toLocaleDateString('es-AR'),time:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
+    date:new Date().toLocaleDateString('es-AR'),
+    time:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
     weather:document.getElementById('wbDesc').textContent});
 }
-
-function openShareModal(rec){
-  if(!rec)return;
-  currentShareRecord=rec;
-  _cachedBlob=null;
-  drawShareCard(rec);
-  // Pre-generate blob in background so it's instant when user taps
-  document.getElementById('shareCanvas').toBlob(blob=>{_cachedBlob=blob;},'image/png');
-  document.getElementById('shareModal').classList.add('open');
-}
-
-// Get blob (use cached or generate fresh)
-function getBlob(){
-  return new Promise(resolve=>{
-    if(_cachedBlob){resolve(_cachedBlob);return;}
-    document.getElementById('shareCanvas').toBlob(blob=>{_cachedBlob=blob;resolve(blob);},'image/png');
-  });
-}
-
-function buildShareText(rec){
-  return `🚴 PEDALE.AR\n${rec.mode==='bike'?'En Bici':'A Pata'} · ${rec.date}\n\n📍 ${rec.dist} km\n⏱ ${rec.duration}\n⚡ ${rec.avgSpeed} km/h promedio\n💨 ${rec.maxSpeed} km/h máxima\n🔥 ${rec.cal} kcal\n🌤 ${(rec.weather||'').split('·')[0].trim()}\n\n#pedaleAR #${rec.mode==='bike'?'EnBici':'APata'}`;
-}
-
-// Main share — opens Android native share sheet with the image
-// User picks WhatsApp → Estado, or Instagram → Historias, or any other app
+function openShareModal(rec){if(!rec)return;currentShareRecord=rec;_cachedBlob=null;drawShareCard(rec);document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;},'image/png');openModal('shareModal');}
+function buildShareText(rec){return`🚴 PEDALE.AR\n${rec.mode==='bike'?'En Bici':'A Pata'} · ${rec.date}\n\n📍 ${rec.dist} km\n⏱ ${rec.duration}\n⚡ ${rec.avgSpeed} km/h promedio\n💨 ${rec.maxSpeed} km/h máxima\n🔥 ${rec.cal} kcal\n🌤 ${(rec.weather||'').split('·')[0].trim()}\n\n#pedaleAR #${rec.mode==='bike'?'EnBici':'APata'}`;}
+function getBlob(){return new Promise(r=>{if(_cachedBlob){r(_cachedBlob);return;}document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;r(b);},'image/png');});}
 async function shareImageNative(hint){
   const rec=currentShareRecord;if(!rec)return;
-  const blob=await getBlob();
-  const file=new File([blob],'pedalear-actividad.png',{type:'image/png'});
-  const txt=buildShareText(rec);
-
+  const blob=await getBlob();const file=new File([blob],'pedalear.png',{type:'image/png'});const txt=buildShareText(rec);
   if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{
-      await navigator.share({
-        files:[file],
-        title:'Mi actividad en PEDALE.AR',
-        text: hint==='whatsapp'||hint==='instagram' ? '' : txt
-        // Note: WhatsApp Status and Instagram Stories ignore the text param;
-        // the image is what gets shared. For WhatsApp chat, text shows as caption.
-      });
-      closeModal('shareModal');
-    }catch(e){
-      if(e.name==='AbortError')return; // user cancelled — that's fine
-      // Fallback if Web Share fails
-      if(hint==='whatsapp'){
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');
-      } else {
-        downloadCard();
-        showToast('📥 Imagen guardada · subila manualmente');
-      }
-    }
-  } else {
-    // Device/browser doesn't support file sharing
-    if(hint==='whatsapp'){
-      window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');
-    } else {
-      downloadCard();
-      showToast('📥 Guardá la imagen y subila a Instagram');
-    }
-  }
+    try{await navigator.share({files:[file],title:'Mi actividad en PEDALE.AR',text:hint==='whatsapp'||hint==='instagram'?'':txt});closeModal('shareModal');}
+    catch(e){if(e.name!=='AbortError'){hint==='whatsapp'?window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank'):downloadCard();}}
+  }else{hint==='whatsapp'?window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank'):downloadCard();}
 }
-
-function downloadCard(){
-  const a=document.createElement('a');
-  a.href=document.getElementById('shareCanvas').toDataURL('image/png');
-  a.download='pedalear-actividad.png';a.click();
-  showToast('📥 Imagen guardada en tus descargas');
-}
-
-async function copyText(){
-  const rec=currentShareRecord;if(!rec)return;
-  const txt=buildShareText(rec);
-  try{await navigator.clipboard.writeText(txt);showToast('📋 Texto copiado!');}
-  catch(e){showToast('No se pudo copiar');}
-}
+function downloadCard(){const a=document.createElement('a');a.href=document.getElementById('shareCanvas').toDataURL('image/png');a.download='pedalear.png';a.click();showToast('📥 Imagen guardada');}
+async function copyText(){const rec=currentShareRecord;if(!rec)return;try{await navigator.clipboard.writeText(buildShareText(rec));showToast('📋 Texto copiado!');}catch(e){}}
 function drawShareCard(rec){
   const canvas=document.getElementById('shareCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
   const gr=ctx.createLinearGradient(0,0,W,H);gr.addColorStop(0,'#1a56db');gr.addColorStop(1,'#0f3a99');
-  ctx.fillStyle=gr;ctx.beginPath();rRect(ctx,0,0,W,H,18);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.04)';
-  for(let i=0;i<50;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random()*22+4;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
-  // Logo pill
+  ctx.fillStyle=gr;rRect(ctx,0,0,W,H,18);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.04)';for(let i=0;i<50;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random()*22+4;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
   ctx.fillStyle='rgba(255,255,255,.14)';ctx.beginPath();rRect(ctx,22,20,190,42,10);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 25px Bebas Neue,sans-serif';ctx.fillText('PEDALE.AR',34,50);
-  // Mode icon
-  ctx.font='48px sans-serif';ctx.fillText(rec.mode==='bike'?'🚴':'🏃',26,135);
-  // Distance
+  ctx.fillStyle='#fff';ctx.font='bold 24px Bebas Neue,sans-serif';ctx.fillText('PEDALE.AR',34,50);
+  ctx.font='46px sans-serif';ctx.fillText(rec.mode==='bike'?'🚴':'🏃',26,132);
   ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='500 12px DM Sans,sans-serif';ctx.fillText('DISTANCIA',94,108);
-  ctx.fillStyle='#fff';ctx.font='bold 76px Bebas Neue,sans-serif';ctx.fillText(rec.dist,88,178);
-  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='bold 20px Bebas Neue,sans-serif';
-  ctx.fillText('KM',92+ctx.measureText(rec.dist).width+6,178);
-  // Stats box
-  ctx.fillStyle='rgba(255,255,255,.11)';ctx.beginPath();rRect(ctx,18,205,W-36,108,14);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 74px Bebas Neue,sans-serif';ctx.fillText(rec.dist,88,175);
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='bold 18px Bebas Neue,sans-serif';ctx.fillText('KM',92+ctx.measureText(rec.dist).width+6,175);
+  ctx.fillStyle='rgba(255,255,255,.11)';ctx.beginPath();rRect(ctx,18,200,W-36,108,14);ctx.fill();
   [{label:'⏱',val:rec.duration,sub:'TIEMPO'},{label:'⚡',val:rec.avgSpeed+' km/h',sub:'PROMEDIO'},{label:'💨',val:rec.maxSpeed+' km/h',sub:'MÁXIMA'},{label:'🔥',val:rec.cal+' kcal',sub:'CALORÍAS'}]
-    .forEach((s,i)=>{
-      const x=18+(i*(W-36)/4)+8;
-      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='12px sans-serif';ctx.fillText(s.label,x+2,228);
-      ctx.fillStyle='#fff';ctx.font='bold 17px DM Sans,sans-serif';ctx.fillText(s.val,x,257);
-      ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px DM Sans,sans-serif';ctx.fillText(s.sub,x,277);
-    });
-  ctx.fillStyle='rgba(255,255,255,.32)';ctx.font='11px DM Sans,sans-serif';
-  ctx.fillText(`${rec.date} ${rec.time}  ·  ${(rec.weather||'').split('·')[0].trim()}`,24,H-14);
+    .forEach((s,i)=>{const x=18+(i*(W-36)/4)+8;ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='11px sans-serif';ctx.fillText(s.label,x+2,224);ctx.fillStyle='#fff';ctx.font='bold 16px DM Sans,sans-serif';ctx.fillText(s.val,x,252);ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px DM Sans,sans-serif';ctx.fillText(s.sub,x,270);});
+  ctx.fillStyle='rgba(255,255,255,.32)';ctx.font='11px DM Sans,sans-serif';ctx.fillText(`${rec.date} ${rec.time}  ·  ${(rec.weather||'').split('·')[0].trim()}`,24,H-14);
 }
-function rRect(ctx,x,y,w,h,r){ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
-// MODALS / TABS
+function rRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+
+// ════════════════════════════════
+// HISTORY
+// ════════════════════════════════
+function renderHistory(){
+  const list=document.getElementById('histList'),empty=document.getElementById('emptyHist');
+  const fl=document.getElementById('friendsList');
+  // Friends
+  fl.innerHTML='';
+  friendsData.forEach(f=>{
+    const c=document.createElement('div');c.className='fcard';
+    c.innerHTML=`<div class="fcard-avatar">${f.m==='bike'?'🚴':'🏃'}</div>
+      <div class="fcard-info"><div class="fcard-name">${f.n||'Amigo'}</div><div class="fcard-sub">${f.dt} · ${f.dur}</div></div>
+      <div class="fcard-km">${f.d} km</div>
+      <button class="fcard-del" onclick="deleteFriend(${f.id})">✕</button>`;
+    c.querySelector('.fcard-avatar').style.cursor='pointer';
+    c.querySelector('.fcard-avatar').onclick=()=>{
+      if(f.c&&f.c.length>1){showTab('map');if(window._friendLayer)map.removeLayer(window._friendLayer);window._friendLayer=L.polyline(f.c,{color:'#ea580c',weight:3.5,opacity:.8,dashArray:'8,4'}).addTo(map);map.fitBounds(window._friendLayer.getBounds(),{padding:[40,40]});}
+    };
+    fl.appendChild(c);
+  });
+  // My activities
+  list.innerHTML='';
+  if(!historyData.length){empty.style.display='flex';list.style.display='none';return;}
+  empty.style.display='none';list.style.display='flex';
+  historyData.forEach(r=>{
+    const c=document.createElement('div');c.className='hcard';
+    c.innerHTML=`<div class="hcard-top">
+        <div class="hcard-icon">${r.mode==='bike'?'🚴':'🏃'}</div>
+        <div class="hcard-meta">
+          <div class="hcard-title">${r.mode==='bike'?'En Bici':'A Pata'} · ${r.date} ${r.time}</div>
+          <div class="hcard-sub">⚡ ${r.avgSpeed} km/h · 💨 ${r.maxSpeed} max · 🔥 ${r.cal} kcal</div>
+        </div>
+        <div class="hcard-right"><div class="hcard-km">${r.dist}</div><div class="hcard-time">km · ${r.duration}</div></div>
+      </div>
+      <div class="hcard-actions">
+        <button class="hcard-btn blue" onclick='showRouteOnMap(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>🗺️ Ver ruta</button>
+        <button class="hcard-btn blue" onclick='openShareModal(${JSON.stringify({...r,coords:undefined,speedLog:undefined}).replace(/'/g,"&#39;")})'>↗ Share</button>
+        <button class="hcard-btn" onclick='exportRoute(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>👥 Compartir ruta</button>
+      </div>`;
+    list.appendChild(c);
+  });
+}
+
+// ════════════════════════════════
+// MODALS / TABS / MODE
+// ════════════════════════════════
 function openSettings(){
-  renderAlertList();
-  // Load saved API key into field
-  const saved=localStorage.getItem('tomtomKey')||'';
-  document.getElementById('tomtomKey').value=saved;
-  document.getElementById('settingsModal').classList.add('open');
+  renderAlertList();initNotifUI();
+  const saved=localStorage.getItem('tomtomKey')||'';document.getElementById('tomtomKey').value=saved;
+  openModal('settingsModal');
 }
+function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-
-// ─── TRAFFIC ─────────────────────────────────────
-let trafficLayer=null, trafficOn=false;
-
-function saveTrafficKey(){
-  const key=document.getElementById('tomtomKey').value.trim();
-  if(!key){showToast('⚠️ Ingresá una API key válida');return;}
-  localStorage.setItem('tomtomKey',key);
-  showToast('✅ API key guardada');
-  // If traffic was on, refresh with new key
-  if(trafficOn){removeTrafficLayer();addTrafficLayer();}
-}
-
-function addTrafficLayer(){
-  const key=localStorage.getItem('tomtomKey');
-  if(!key){
-    showToast('⚠️ Configurá tu TomTom API key en ⚙️');
-    openSettings();
-    return false;
-  }
-  // TomTom Traffic Flow tiles — color-coded by speed ratio
-  trafficLayer=L.tileLayer(
-    `https://api.tomtom.com/traffic/map/4/tile/flow/relative0-dark/{z}/{x}/{y}.png?key=${key}&tileSize=256`,
-    {maxZoom:19,opacity:.75,attribution:'© TomTom Traffic'}
-  ).addTo(map);
-  return true;
-}
-
-function removeTrafficLayer(){
-  if(trafficLayer){map.removeLayer(trafficLayer);trafficLayer=null;}
-}
-
-function toggleTraffic(){
-  if(trafficOn){
-    removeTrafficLayer();
-    trafficOn=false;
-    document.getElementById('trafficBtn').classList.remove('on');
-    document.getElementById('trafficLegend').classList.remove('show');
-    localStorage.setItem('trafficWasOn','0');
-    showToast('🚦 Tránsito desactivado');
-  }else{
-    const ok=addTrafficLayer();
-    if(ok){
-      trafficOn=true;
-      document.getElementById('trafficBtn').classList.add('on');
-      document.getElementById('trafficLegend').classList.add('show');
-      localStorage.setItem('trafficWasOn','1');
-      showToast('🚦 Tránsito activado');
-    }
-  }
-}
 function setMode(mode){
   activityMode=mode;
   document.getElementById('pillBike').classList.toggle('active',mode==='bike');
@@ -924,323 +1127,123 @@ function showTab(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
-  const idx=['map','stats','music','history'].indexOf(id);
+  const idx=['map','stats','logros','history'].indexOf(id);
   if(idx>=0)document.querySelectorAll('.tab')[idx].classList.add('active');
   if(id==='map')setTimeout(()=>map&&map.invalidateSize(),50);
+  if(id==='stats')setTimeout(()=>drawSpeedGraph(speedLog,maxSpeed),50);
+  if(id==='logros')renderLogros();
 }
 
-// HISTORY
-function renderHistory(){
-  const list=document.getElementById('histList'),empty=document.getElementById('emptyHist');
-  list.innerHTML='';
-  if(!historyData.length){empty.style.display='flex';list.style.display='none';return;}
-  empty.style.display='none';list.style.display='flex';
-  historyData.forEach(r=>{
-    const c=document.createElement('div');c.className='hcard';
-    c.innerHTML=`<div class="hcard-icon">${r.mode==='bike'?'🚴':'🏃'}</div>
-      <div class="hcard-meta">
-        <div class="hcard-title">${r.mode==='bike'?'En Bici':'A Pata'} · ${r.date} ${r.time}</div>
-        <div class="hcard-sub">⚡ ${r.avgSpeed} km/h · 💨 ${r.maxSpeed} max · 🔥 ${r.cal} kcal</div>
-      </div>
-      <div class="hcard-right">
-        <div class="hcard-km">${r.dist}</div>
-        <div class="hcard-time">km · ${r.duration}</div>
-        <button class="share-btn-sm" onclick='openShareModal(${JSON.stringify(r)})'>↗ share</button>
-      </div>`;
-    list.appendChild(c);
-  });
+// ════════════════════════════════
+// WAKE LOCK
+// ════════════════════════════════
+async function acquireWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  try{wakeLock=await navigator.wakeLock.request('screen');document.getElementById('wlDot').classList.add('on');wakeLock.addEventListener('release',()=>{document.getElementById('wlDot').classList.remove('on');wakeLock=null;});}catch(e){}
 }
+function releaseWakeLock(){if(wakeLock){wakeLock.release();wakeLock=null;}document.getElementById('wlDot').classList.remove('on');}
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&isRecording&&!isPaused)await acquireWakeLock();});
 
-// GPS TAG / TOAST
-function showGpsTag(m){document.getElementById('gpsTagText').textContent=m;document.getElementById('gpsTag').classList.add('show');}
-function hideGpsTag(){document.getElementById('gpsTag').classList.remove('show');}
-let _tt;
-function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2400);}
+// ════════════════════════════════
+// ONLINE / OFFLINE
+// ════════════════════════════════
+function updateOnlineStatus(){document.getElementById('offlineBadge').classList.toggle('show',!navigator.onLine);}
+window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
 
+// ════════════════════════════════
+// INSTALL PROMPT
+// ════════════════════════════════
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(!localStorage.getItem('installDone')&&!localStorage.getItem('installDismissed'))setTimeout(showInstallBanner,3000);});
+window.addEventListener('appinstalled',()=>{localStorage.setItem('installDone','1');document.getElementById('installBanner').classList.remove('show');showToast('✅ ¡PEDALE.AR instalada!');});
+function showInstallBanner(){drawIcon(document.getElementById('ibCanvas'),48);document.getElementById('installBanner').classList.add('show');}
+async function installApp(){if(!deferredInstall){showToast('Abrí el menú ⋮ → Agregar a pantalla de inicio');return;}deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;document.getElementById('installBanner').classList.remove('show');if(outcome==='accepted')showToast('🎉 ¡Instalando PEDALE.AR!');}
+function dismissInstall(){document.getElementById('installBanner').classList.remove('show');localStorage.setItem('installDismissed','1');}
+
+// ════════════════════════════════
 // AUDIO
+// ════════════════════════════════
 const audio=document.getElementById('audioEl');
-let playlist=[],curTrack=0,playing=false,progInt=null;
 function loadFiles(inp){playlist=Array.from(inp.files);if(playlist.length){loadTrack(0);showToast(`✅ ${playlist.length} pista(s) cargada(s)`);}}
-function loadTrack(i){if(!playlist[i])return;audio.src=URL.createObjectURL(playlist[i]);audio.volume=document.getElementById('volSlider').value/100;document.getElementById('songTitle').textContent=playlist[i].name.replace(/\.[^.]+$/,'');document.getElementById('songArtist').textContent=`Pista ${i+1}/${playlist.length}`;document.getElementById('albumArt').textContent=activityMode==='bike'?'🚴':'🏃';audio.onloadedmetadata=()=>{document.getElementById('tTot').textContent=fmtAT(audio.duration);};startProg();}
-function togglePlay(){if(!audio.src){showToast('📂 Subí un archivo primero');return;}playing?(audio.pause(),playing=false,document.getElementById('playBtn').textContent='▶'):(audio.play(),playing=true,document.getElementById('playBtn').textContent='⏸');}
-function prevSong(){curTrack=(curTrack-1+playlist.length)%playlist.length;loadTrack(curTrack);if(playing)audio.play();}
-function nextSong(){curTrack=(curTrack+1)%playlist.length;loadTrack(curTrack);if(playing)audio.play();}
+function loadTrack(i){if(!playlist[i])return;audio.src=URL.createObjectURL(playlist[i]);audio.volume=document.getElementById('volSlider').value/100;document.getElementById('songTitle').textContent=playlist[i].name.replace(/\.[^.]+$/,'');document.getElementById('songArtist').textContent=`Pista ${i+1}/${playlist.length}`;document.getElementById('albumArt').textContent=activityMode==='bike'?'🚴':'🏃';audio.onloadedmetadata=()=>document.getElementById('tTot').textContent=fmtAT(audio.duration);startProg();}
+function togglePlay(){if(!audio.src){showToast('📂 Subí un archivo primero');return;}audioPlaying?(audio.pause(),audioPlaying=false,document.getElementById('playBtn').textContent='▶',document.getElementById('musicFab').classList.remove('playing')):(audio.play(),audioPlaying=true,document.getElementById('playBtn').textContent='⏸',document.getElementById('musicFab').classList.add('playing'));}
+function prevSong(){curTrack=(curTrack-1+playlist.length)%playlist.length;loadTrack(curTrack);if(audioPlaying)audio.play();}
+function nextSong(){curTrack=(curTrack+1)%playlist.length;loadTrack(curTrack);if(audioPlaying)audio.play();}
 function seekBack(){audio.currentTime=Math.max(0,audio.currentTime-10);}
 function seekFwd(){audio.currentTime=Math.min(audio.duration||0,audio.currentTime+10);}
 function setVol(v){audio.volume=v/100;}
 function seekTo(e){if(audio.duration)audio.currentTime=(e.offsetX/e.currentTarget.offsetWidth)*audio.duration;}
 function startProg(){clearInterval(progInt);progInt=setInterval(()=>{if(!audio.duration)return;document.getElementById('progFill').style.width=(audio.currentTime/audio.duration*100)+'%';document.getElementById('tNow').textContent=fmtAT(audio.currentTime);},500);}
 function fmtAT(s){return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
-audio.addEventListener('ended',()=>{nextSong();if(playing)audio.play();});
+audio.addEventListener('ended',()=>{nextSong();if(audioPlaying)audio.play();});
 
-// ─── WAKE LOCK ───────────────────────────────────
-// Mantiene la pantalla encendida mientras grabás
-// → el GPS sigue funcionando aunque el teléfono intente dormir
-let wakeLock = null;
+// ════════════════════════════════
+// GPS TAG / TOAST
+// ════════════════════════════════
+function showGpsTag(m){document.getElementById('gpsTagText').textContent=m;document.getElementById('gpsTag').classList.add('show');}
+function hideGpsTag(){document.getElementById('gpsTag').classList.remove('show');}
+let _tt;
+function showToast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2400);}
 
-async function acquireWakeLock(){
-  if(!('wakeLock' in navigator)) return;
-  try{
-    wakeLock = await navigator.wakeLock.request('screen');
-    document.getElementById('wlDot').classList.add('on');
-    wakeLock.addEventListener('release', ()=>{
-      document.getElementById('wlDot').classList.remove('on');
-      wakeLock = null;
-    });
-  }catch(e){}
+// ════════════════════════════════
+// SERVICE WORKER
+// ════════════════════════════════
+const SW_CODE=`const C='pedale-v2';const S=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'];self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(S).catch(()=>{})));self.skipWaiting();});self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>{const u=e.request.url;if(u.includes('leaflet')||u.includes('cartocdn')||u.includes('googleapis')||u.includes('tomtom')){e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res&&res.ok){const cl=res.clone();caches.open(C).then(c=>c.put(e.request,cl));}return res;})));}});`;
+async function registerSW(){if(!('serviceWorker' in navigator))return;try{const b=new Blob([SW_CODE],{type:'text/javascript'});await navigator.serviceWorker.register(URL.createObjectURL(b));}catch(e){console.log('SW:',e.message);}}
+
+// ════════════════════════════════
+// ICON + PWA MANIFEST
+// ════════════════════════════════
+function drawIcon(canvas,size){
+  canvas.width=size;canvas.height=size;
+  const ctx=canvas.getContext('2d');const s=size;
+  const bg=ctx.createLinearGradient(0,0,s,s);bg.addColorStop(0,'#2563eb');bg.addColorStop(1,'#1e3a8a');
+  ctx.fillStyle=bg;
+  const br=s*.22;ctx.beginPath();ctx.moveTo(br,0);ctx.lineTo(s-br,0);ctx.quadraticCurveTo(s,0,s,br);ctx.lineTo(s,s-br);ctx.quadraticCurveTo(s,s,s-br,s);ctx.lineTo(br,s);ctx.quadraticCurveTo(0,s,0,s-br);ctx.lineTo(0,br);ctx.quadraticCurveTo(0,0,br,0);ctx.closePath();ctx.fill();
+  // Wheel — smaller, gives more room for text
+  const cx=s*.5,cy=s*.41,outerR=s*.27,tireW=s*.065,hubR=s*.05,spokeR=outerR-tireW*.55;
+  ctx.strokeStyle='#fff';ctx.lineWidth=tireW;ctx.lineCap='round';
+  ctx.beginPath();ctx.arc(cx,cy,outerR,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='#ef4444';ctx.lineWidth=tireW*1.05;
+  ctx.beginPath();ctx.arc(cx,cy,outerR,Math.PI*.55,Math.PI*.95);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.82)';ctx.lineWidth=s*.02;
+  for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2-Math.PI/8;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*hubR*1.8,cy+Math.sin(a)*hubR*1.8);ctx.lineTo(cx+Math.cos(a)*spokeR,cy+Math.sin(a)*spokeR);ctx.stroke();}
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,hubR,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#1e3a8a';ctx.beginPath();ctx.arc(cx,cy,hubR*.45,0,Math.PI*2);ctx.fill();
+  // Wordmark — more space now
+  const fz=s*.13;
+  ctx.font=`900 ${fz}px 'Arial Black',Arial,sans-serif`;ctx.textBaseline='alphabetic';ctx.textAlign='left';
+  const word='PEDALE',ww=ctx.measureText(word).width,dotR=fz*.21,arw=ctx.measureText('AR').width;
+  const totalW=ww+dotR*2+arw+s*.016,sx=(s-totalW)*.5,ty=s*.915;
+  ctx.fillStyle='#fff';ctx.fillText(word,sx,ty);
+  ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(sx+ww+dotR+s*.004,ty-fz*.22,dotR,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.fillText('AR',sx+ww+dotR*2+s*.016,ty);
+  return canvas;
+}
+function createPWAManifest(){
+  const c192=document.createElement('canvas'),c512=document.createElement('canvas');
+  drawIcon(c192,192);drawIcon(c512,512);
+  const i192=c192.toDataURL('image/png'),i512=c512.toDataURL('image/png');
+  document.getElementById('appleIcon').href=i192;
+  const manifest={name:'PEDALE.AR',short_name:'PEDALE.AR',description:'Seguí tu recorrido en bici o corriendo',start_url:'./',display:'standalone',background_color:'#ffffff',theme_color:'#1a56db',orientation:'portrait-primary',lang:'es-AR',categories:['sports','health','fitness'],icons:[{src:i192,sizes:'192x192',type:'image/png'},{src:i512,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  document.getElementById('pwaManifest').href=URL.createObjectURL(blob);
+  // Header icon
+  drawIcon(document.getElementById('headerIcon'),28);
 }
 
-function releaseWakeLock(){
-  if(wakeLock){ wakeLock.release(); wakeLock = null; }
-  document.getElementById('wlDot').classList.remove('on');
-}
-
-// Cuando la pantalla vuelve a estar visible y todavía estás grabando → re-adquirir
-document.addEventListener('visibilitychange', async ()=>{
-  if(document.visibilityState === 'visible' && isRecording && !isPaused){
-    await acquireWakeLock();
-  }
-});
-
-// ─── OFFLINE DETECTION ────────────────────────────
-function updateOnlineStatus(){
-  const badge = document.getElementById('offlineBadge');
-  if(!navigator.onLine){
-    badge.classList.add('show');
-  } else {
-    badge.classList.remove('show');
-  }
-}
-window.addEventListener('online',  updateOnlineStatus);
-window.addEventListener('offline', updateOnlineStatus);
-
-// ─── INSTALL PROMPT ───────────────────────────────
-let deferredInstall = null;
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstall = e;
-  // Solo mostramos si nunca fue instalada ni descartada
-  if(!localStorage.getItem('installDone') && !localStorage.getItem('installDismissed')){
-    // Pequeño delay para que no aparezca inmediatamente al abrir
-    setTimeout(showInstallBanner, 3000);
-  }
-});
-
-window.addEventListener('appinstalled', ()=>{
-  localStorage.setItem('installDone','1');
-  document.getElementById('installBanner').classList.remove('show');
-  showToast('✅ ¡PEDALE.AR instalada en tu teléfono!');
-  deferredInstall = null;
-});
-
-function showInstallBanner(){
-  // Dibujar ícono chico en el banner
-  const small = drawIcon(52);
-  const img = new Image();
-  img.onload = ()=>{
-    const c = document.getElementById('ibCanvas');
-    c.getContext('2d').drawImage(img, 0, 0, 52, 52);
-  };
-  img.src = small;
-  document.getElementById('installBanner').classList.add('show');
-}
-
-async function installApp(){
-  if(!deferredInstall){ showToast('Abrí el menú ⋮ → Agregar a pantalla de inicio'); return; }
-  deferredInstall.prompt();
-  const { outcome } = await deferredInstall.userChoice;
-  deferredInstall = null;
-  document.getElementById('installBanner').classList.remove('show');
-  if(outcome === 'accepted') showToast('🎉 ¡Instalando PEDALE.AR!');
-}
-
-function dismissInstall(){
-  document.getElementById('installBanner').classList.remove('show');
-  localStorage.setItem('installDismissed','1');
-}
-
-// ─── SERVICE WORKER (cache de tiles y assets) ────
-// Cachea Leaflet, las fuentes y los tiles del mapa ya visitados
-// para que el mapa funcione offline en zonas conocidas
-const SW_CODE = `
-const CACHE = 'pedale-v1';
-const PRECACHE = [
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE).catch(()=>{})));
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-self.addEventListener('fetch', e => {
-  const u = e.request.url;
-  const cacheable =
-    u.includes('unpkg.com/leaflet') ||
-    u.includes('basemaps.cartocdn.com') ||
-    u.includes('googleapis.com/css') ||
-    u.includes('gstatic.com') ||
-    u.includes('api.tomtom.com/traffic');
-  if(!cacheable) return;
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if(cached) return cached;
-      return fetch(e.request).then(res => {
-        if(res && res.ok){
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return res;
-      }).catch(() => cached || new Response('', {status: 503}));
-    })
-  );
-});
-`;
-
-async function registerSW(){
-  if(!('serviceWorker' in navigator)) return;
-  try{
-    const blob = new Blob([SW_CODE], {type:'text/javascript'});
-    const url = URL.createObjectURL(blob);
-    const reg = await navigator.serviceWorker.register(url, {scope: './'});
-    console.log('SW activo:', reg.scope);
-  }catch(e){
-    // En Chrome con blob URLs puede fallar por restricción de scope.
-    // No es crítico — el caché HTTP del navegador igual guarda los tiles visitados.
-    console.log('SW no disponible en este contexto:', e.message);
-  }
-}
-
+// ════════════════════════════════
 // BOOT
+// ════════════════════════════════
 renderHistory();
-renderAlertList();
+renderLogros();
 initMap();
 createPWAManifest();
 updateOnlineStatus();
 registerSW();
-if(localStorage.getItem('trafficWasOn')==='1' && localStorage.getItem('tomtomKey')) toggleTraffic();
-
-// ─── PWA ICON + MANIFEST ──────────────────────────
-function drawIcon(size){
-  const c=document.createElement('canvas');
-  c.width=size;c.height=size;
-  const ctx=c.getContext('2d');
-  const s=size;
-
-  // ── Background: blue rounded square ──
-  const grad=ctx.createLinearGradient(0,0,s,s);
-  grad.addColorStop(0,'#2563eb');grad.addColorStop(1,'#1a3fa8');
-  ctx.fillStyle=grad;
-  roundedRect(ctx,0,0,s,s,s*.18);ctx.fill();
-
-  // Subtle inner glow top-left
-  const glow=ctx.createRadialGradient(s*.25,s*.2,0,s*.25,s*.2,s*.6);
-  glow.addColorStop(0,'rgba(255,255,255,.12)');glow.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=glow;roundedRect(ctx,0,0,s,s,s*.18);ctx.fill();
-
-  // ── Bicycle drawing ──
-  const lw=s*.055;
-  ctx.strokeStyle='#ffffff';ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
-
-  // Wheel centers and radius
-  const wr=s*.2;
-  const lx=s*.28, rx=s*.72, wy=s*.63;
-
-  // Left wheel
-  ctx.beginPath();ctx.arc(lx,wy,wr,0,Math.PI*2);ctx.stroke();
-  // Right wheel
-  ctx.beginPath();ctx.arc(rx,wy,wr,0,Math.PI*2);ctx.stroke();
-
-  // Bottom bracket (pedal center)
-  const bb={x:s*.5,y:wy};
-  // Rear axle
-  const ra={x:lx,y:wy};
-  // Head tube top
-  const ht={x:rx-s*.04,y:s*.33};
-  // Seat tube top
-  const st={x:s*.42,y:s*.28};
-  // Fork bottom = front axle
-  const fa={x:rx,y:wy};
-
-  // Chainstay + seatstay (rear triangle)
-  ctx.beginPath();ctx.moveTo(ra.x,ra.y);ctx.lineTo(bb.x,bb.y);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(ra.x,ra.y);ctx.lineTo(st.x,st.y);ctx.stroke();
-
-  // Seat tube
-  ctx.beginPath();ctx.moveTo(st.x,st.y);ctx.lineTo(bb.x,bb.y);ctx.stroke();
-
-  // Top tube + down tube
-  ctx.beginPath();ctx.moveTo(st.x,st.y);ctx.lineTo(ht.x,ht.y);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(bb.x,bb.y);ctx.lineTo(ht.x,ht.y);ctx.stroke();
-
-  // Fork
-  ctx.beginPath();ctx.moveTo(ht.x,ht.y);ctx.lineTo(fa.x,fa.y);ctx.stroke();
-
-  // Handlebar stem + bar
-  const hbx=ht.x+s*.03, hby=ht.y-s*.04;
-  ctx.beginPath();ctx.moveTo(ht.x,ht.y);ctx.lineTo(hbx,hby);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(hbx-s*.06,hby+s*.04);ctx.lineTo(hbx+s*.04,hby-s*.06);ctx.stroke();
-
-  // Saddle
-  ctx.beginPath();ctx.moveTo(st.x-s*.1,st.y-s*.01);ctx.lineTo(st.x+s*.06,st.y-s*.01);ctx.stroke();
-
-  // ── "PEDALE.AR" wordmark at bottom ──
-  ctx.fillStyle='rgba(255,255,255,.9)';
-  ctx.font=`bold ${s*.11}px 'Arial Black', sans-serif`;
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillText('PEDALE',s*.45,s*.91);
-
-  // Red dot
-  ctx.fillStyle='#ef4444';
-  ctx.beginPath();ctx.arc(s*.735,s*.875,s*.04,0,Math.PI*2);ctx.fill();
-
-  // AR
-  ctx.fillStyle='rgba(255,255,255,.9)';
-  ctx.font=`bold ${s*.11}px 'Arial Black', sans-serif`;
-  ctx.fillText('AR',s*.83,s*.91);
-
-  return c.toDataURL('image/png');
-}
-
-function roundedRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
-  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
-  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
-  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
-  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
-}
-
-function createPWAManifest(){
-  // Draw icons at required sizes
-  const icon192=drawIcon(192);
-  const icon512=drawIcon(512);
-  const icon180=drawIcon(180); // Apple touch
-
-  // Set apple touch icon immediately
-  document.getElementById('appleIcon').href=icon180;
-
-  // Build manifest
-  const manifest={
-    name:'PEDALE.AR',
-    short_name:'PEDALE.AR',
-    description:'Seguí tu recorrido en bici o corriendo',
-    start_url:'./',
-    display:'standalone',
-    background_color:'#ffffff',
-    theme_color:'#1a56db',
-    orientation:'portrait-primary',
-    lang:'es-AR',
-    categories:['sports','health','fitness'],
-    icons:[
-      {src:icon192, sizes:'192x192', type:'image/png'},
-      {src:icon512, sizes:'512x512', type:'image/png', purpose:'any maskable'}
-    ]
-  };
-
-  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  document.getElementById('pwaManifest').href=URL.createObjectURL(blob);
-}
+initNotifUI();
+drawSpeedGraph(null,0);
+if(localStorage.getItem('trafficWasOn')==='1'&&localStorage.getItem('tomtomKey'))toggleTraffic();
 </script>
 </body>
 </html>
