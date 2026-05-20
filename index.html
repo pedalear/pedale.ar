@@ -349,7 +349,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
         <div class="rec-dot on" id="recDot"></div>
         <div class="wl-dot" id="wlDot"></div>
         <button class="btn btn-secondary" id="btnPause" onclick="pauseActivity()">⏸ &nbsp;PAUSA</button>
-        <button class="btn btn-share" onclick="shareCurrentActivity()">↗ Compartir</button>
+        <button class="btn btn-share" onclick="shareCurrentActivity()">↗ Compartí tu recorrido</button>
         <button class="btn btn-danger" onclick="stopActivity()">⏹</button>
       </div>
     </div>
@@ -465,7 +465,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="modal-handle"></div>
     <div class="modal-title">↗ Compartir actividad</div>
     <canvas id="shareCanvas" width="600" height="340"></canvas>
-    <div class="share-hint">💡 <span>Compartí en <strong>WhatsApp</strong> o <strong>Instagram</strong>.</span></div>
+    <div class="share-hint">💡 <span>Se abre el menú de Android. Elegí <strong>WhatsApp → Estado</strong> o <strong>Instagram → Historias</strong>.</span></div>
     <div class="share-primary">
       <button class="sa-primary sa-wa" onclick="shareImageNative('whatsapp')"><span class="sa-icon">💬</span><span class="sa-name">WhatsApp</span><span class="sa-sub">Estado</span></button>
       <button class="sa-primary sa-ig" onclick="shareImageNative('instagram')"><span class="sa-icon">📸</span><span class="sa-name">Instagram</span><span class="sa-sub">Historias</span></button>
@@ -942,8 +942,8 @@ function exportRoute(rec){
   };
   const code=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   // Copy + share
-  const txt=`🚴 Pedale.AR — Ruta compartida\n${data.n} · ${data.dt}\n📍 ${data.d} km · ⏱ ${data.dur}\n\nCódigo de ruta:\n${code}`;
-  if(navigator.share){navigator.share({title:'Mi ruta en Pedale.AR',text:txt}).catch(()=>{});}
+  const txt=`🚴 PEDALE.AR — Ruta compartida\n${data.n} · ${data.dt}\n📍 ${data.d} km · ⏱ ${data.dur}\n\nCódigo de ruta:\n${code}`;
+  if(navigator.share){navigator.share({title:'Mi ruta en PEDALE.AR',text:txt}).catch(()=>{});}
   else{navigator.clipboard?.writeText(txt);showToast('📋 Código copiado');}
 }
 function importFriend(){
@@ -1011,7 +1011,7 @@ function scheduleNotif(){
   const ms=next-now;
   clearTimeout(window._notifTimer);
   window._notifTimer=setTimeout(()=>{
-    new Notification('Pedale.AR 🚴',{body:'¡Es hora de salir a pedalear!',icon:document.getElementById('appleIcon')?.href||''});
+    new Notification('PEDALE.AR 🚴',{body:'¡Es hora de salir a pedalear!',icon:document.getElementById('appleIcon')?.href||''});
     scheduleNotif();
   },ms);
 }
@@ -1057,13 +1057,13 @@ function shareCurrentActivity(){
     weather:document.getElementById('wbDesc').textContent});
 }
 function openShareModal(rec){if(!rec)return;currentShareRecord=rec;_cachedBlob=null;drawShareCard(rec);document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;},'image/png');openModal('shareModal');}
-function buildShareText(rec){return`🚴 Pedale.AR\n${rec.mode==='bike'?'En Bici':'A Pata'} · ${rec.date}\n\n📍 ${rec.dist} km\n⏱ ${rec.duration}\n⚡ ${rec.avgSpeed} km/h promedio\n💨 ${rec.maxSpeed} km/h máxima\n🔥 ${rec.cal} kcal\n🌤 ${(rec.weather||'').split('·')[0].trim()}\n\n#pedaleAR #${rec.mode==='bike'?'EnBici':'APata'}`;}
+function buildShareText(rec){return`🚴 PEDALE.AR\n${rec.mode==='bike'?'En Bici':'A Pata'} · ${rec.date}\n\n📍 ${rec.dist} km\n⏱ ${rec.duration}\n⚡ ${rec.avgSpeed} km/h promedio\n💨 ${rec.maxSpeed} km/h máxima\n🔥 ${rec.cal} kcal\n🌤 ${(rec.weather||'').split('·')[0].trim()}\n\n#pedaleAR #${rec.mode==='bike'?'EnBici':'APata'}`;}
 function getBlob(){return new Promise(r=>{if(_cachedBlob){r(_cachedBlob);return;}document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;r(b);},'image/png');});}
 async function shareImageNative(hint){
   const rec=currentShareRecord;if(!rec)return;
   const blob=await getBlob();const file=new File([blob],'pedalear.png',{type:'image/png'});const txt=buildShareText(rec);
   if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],title:'Mi actividad en Pedale.AR',text:hint==='whatsapp'||hint==='instagram'?'':txt});closeModal('shareModal');}
+    try{await navigator.share({files:[file],title:'Mi actividad en PEDALE.AR',text:hint==='whatsapp'||hint==='instagram'?'':txt});closeModal('shareModal');}
     catch(e){if(e.name!=='AbortError'){hint==='whatsapp'?window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank'):downloadCard();}}
   }else{hint==='whatsapp'?window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank'):downloadCard();}
 }
