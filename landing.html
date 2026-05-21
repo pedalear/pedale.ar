@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1f244c">
 <meta name="description" content="Pedale.AR — Seguí tus recorridos en bici o corriendo. App gratuita, sin publicidad, hecha en Argentina.">
-<title>Pedale.AR — Andá sin límites</title>
+<title>Pedale.AR — Andá sin vueltas</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -133,7 +133,7 @@ footer a{color:var(--orange);text-decoration:none}
 
   <div class="hero-content">
     <div class="hero-logo">Pedale<span class="dot">.</span>AR</div>
-    <div class="hero-tagline">Andá sin límites 🚴</div>
+    <div class="hero-tagline">Andá sin vueltas 🚴</div>
     <div class="hero-sub">Gratis · Sin publicidad · Hecha en Rafaela, Argentina</div>
     <div class="cta-wrap">
       <div class="free-badge">✨ 100% gratuita</div>
@@ -152,7 +152,7 @@ footer a{color:var(--orange);text-decoration:none}
 <section class="section">
   <div class="section-label">Todo lo que necesitás</div>
   <div class="section-title">Una app de verdad, sin vueltas</div>
-  <div class="section-desc">Todo lo que necesitás para salir a rodar, sin pagar suscripción ni ver publicidades.</div>
+  <div class="section-desc">Todo lo que necesitás para salir a bicicletear, sin pagar suscripción ni ver publicidades.</div>
 
   <div class="features-grid">
     <div class="feat-card">
@@ -249,6 +249,15 @@ footer a{color:var(--orange);text-decoration:none}
   </div>
 </section>
 
+
+<!-- ══ QR CODE ══ -->
+<section class="section" style="text-align:center">
+  <div class="section-label">Escaneá y listo</div>
+  <div class="section-title">Instalala en segundos</div>
+  <div class="section-desc" style="margin-bottom:24px">Apuntá la cámara del celu y se abre directo en Chrome.</div>
+  <div id="qrcode" style="display:inline-block;background:#fff;padding:16px;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.3)"></div>
+  <div style="font-size:12px;opacity:.5;margin-top:14px;letter-spacing:.5px">pedalear.github.io/pedale.ar</div>
+</section>
 <!-- ══ INSTALL CTA ══ -->
 <section class="install-section">
   <div class="free-badge">📲 Instalala hoy</div>
@@ -266,5 +275,14 @@ footer a{color:var(--orange);text-decoration:none}
   <a href="mailto:maurikrause1983@gmail.com">Contacto</a>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+new QRCode(document.getElementById("qrcode"),{
+  text:"https://pedalear.github.io/pedale.ar/",
+  width:200,height:200,
+  colorDark:"#1f244c",colorLight:"#ffffff",
+  correctLevel:QRCode.CorrectLevel.H
+});
+</script>
 </body>
 </html>
