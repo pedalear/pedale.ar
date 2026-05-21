@@ -381,6 +381,36 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 [data-theme="dark"] .icon-btn{background:#252d3d;border-color:rgba(255,255,255,.12);color:#f0f4ff}
 [data-theme="dark"] .bottom-sheet{box-shadow:0 -4px 32px rgba(0,0,0,.4)}
 [data-theme="dark"] .toast{background:#e8eaf6;color:#1f244c}
+
+/* Activity notes */
+.note-modal-wrap{margin-top:12px}
+.note-textarea{width:100%;min-height:80px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;color:var(--text);resize:none;line-height:1.5}
+.note-textarea:focus{border-color:var(--accent)}
+.hcard-note{font-size:11px;color:var(--soft);margin-top:4px;font-style:italic;line-height:1.4;padding:6px 8px;background:var(--surface2);border-radius:8px}
+
+/* ETA badge */
+.eta-badge{display:none;align-items:center;gap:6px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--navy);position:absolute;top:54px;right:12px;z-index:20;white-space:nowrap;box-shadow:var(--shadow)}
+.eta-badge.show{display:flex}
+[data-theme="dark"] .eta-badge{background:rgba(26,31,46,.92);color:var(--text)}
+
+/* Voice toggle */
+.voice-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+
+/* Onboarding */
+.onboard-backdrop{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);backdrop-filter:blur(2px);display:none;flex-direction:column;align-items:center;justify-content:flex-end}
+.onboard-backdrop.show{display:flex}
+.onboard-card{background:var(--surface);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:500px;animation:slideUp .3s cubic-bezier(.34,1.2,.64,1)}
+.onboard-step{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.onboard-icon{font-size:48px;margin-bottom:12px}
+.onboard-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;margin-bottom:8px}
+.onboard-desc{font-size:14px;color:var(--soft);line-height:1.6;margin-bottom:24px}
+.onboard-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.onboard-dot{width:6px;height:6px;border-radius:50%;background:var(--surface2);transition:all .2s}
+.onboard-dot.active{background:var(--accent);width:18px;border-radius:3px}
+.onboard-btns{display:flex;gap:10px}
+.onboard-skip{flex:0 0 auto;height:48px;padding:0 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.onboard-next{flex:1;height:48px;border-radius:12px;border:none;background:linear-gradient(135deg,#ea580c,#dd3256);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;cursor:pointer}
+
 /* ── SHARED ACTIVITY MODAL ── */
 .shared-act-card{background:linear-gradient(135deg,#f79d23,#ea580c,#dd3256,#592452);border-radius:18px;padding:20px;color:#fff;text-align:center;margin-bottom:16px}
 .shared-act-dist{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;letter-spacing:2px}
@@ -485,6 +515,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <span class="replay-progress" id="replayProgress">▶ Replay</span>
     <button class="replay-btn stop" onclick="stopReplay()">⏹ Detener</button>
   </div>
+  <div class="eta-badge" id="etaBadge">🎯 <span id="etaText">--</span></div>
   <div class="follow-badge" id="followBadge"><div class="follow-dot"></div>Siguiendo ruta</div>
   <div class="gps-tag" id="gpsTag"><div class="gps-pulse"></div><span id="gpsTagText">Buscando GPS…</span></div>
   <button class="traffic-btn" id="trafficBtn" onclick="toggleTraffic()">🚦</button>
@@ -709,6 +740,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="sec-div">🔔 Tipo de aviso</div>
     <div class="cfg-row"><div class="cfg-desc">Vibración<small>Al completar cada distancia</small></div><label class="toggle"><input type="checkbox" id="vibToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
     <div class="cfg-row"><div class="cfg-desc">Sonido (beep)<small>Triple pitido al llegar</small></div><label class="toggle"><input type="checkbox" id="soundToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="cfg-row"><div class="cfg-desc">Voz en español 🎙️<small>"5 kilómetros completados"</small></div><label class="toggle"><input type="checkbox" id="voiceToggle" onchange="localStorage.setItem('voiceOn',this.checked?'1':'0')"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
     <div style="margin-top:18px"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeModal('settingsModal')">✓ &nbsp;LISTO</button></div>
 
     <div class="sec-div">☕ Apoyá el proyecto</div>
@@ -788,6 +820,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       <div class="prog-times"><span id="tNow">0:00</span><span id="tTot">0:00</span></div>
       <div class="vol-row"><span>🔈</span><input type="range" min="0" max="100" value="80" id="volSlider" oninput="setVol(this.value)"><span>🔊</span></div>
       <label class="upload-btn">📂 Subir archivos de audio<input type="file" accept="audio/*" multiple style="display:none" onchange="loadFiles(this)"></label>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="onboard-backdrop" id="onboarding">
+  <div class="onboard-card">
+    <div class="onboard-step" id="obStep">Paso 1 de 5</div>
+    <div class="onboard-icon" id="obIcon">🗺️</div>
+    <div class="onboard-title" id="obTitle">BIENVENIDO A PEDALE.AR</div>
+    <div class="onboard-desc" id="obDesc">Tu app para salir a pedalear o correr en Argentina. Gratis, sin publicidad.</div>
+    <div class="onboard-dots" id="obDots"></div>
+    <div class="onboard-btns">
+      <button class="onboard-skip" onclick="finishOnboarding()">Saltar</button>
+      <button class="onboard-next" onclick="nextOnboardStep()">SIGUIENTE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTES MODAL -->
+<div class="modal-backdrop" id="notesModal" onclick="closeModal('notesModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📝 Nota de la actividad</div>
+    <div class="note-modal-wrap">
+      <textarea class="note-textarea" id="noteText" placeholder="¿Cómo fue la salida? Condiciones, sensaciones, ruta…" maxlength="300"></textarea>
+      <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:4px"><span id="noteChars">0</span>/300</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-secondary" style="flex:0 0 auto;width:52px" onclick="closeModal('notesModal')">✕</button>
+      <button class="btn btn-primary" onclick="saveNote()">💾 &nbsp;GUARDAR NOTA</button>
     </div>
   </div>
 </div>
@@ -881,6 +944,7 @@ function checkDistanceAlerts(dist){
   });
 }
 function triggerMilestone(km){
+  speak(`${km<10?km.toFixed(1):km} kilómetros completados`);
   if(document.getElementById('soundToggle').checked)playBeep();
   if(document.getElementById('vibToggle').checked&&navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
   document.getElementById('alertFlash').classList.add('flash');setTimeout(()=>document.getElementById('alertFlash').classList.remove('flash'),800);
@@ -1077,12 +1141,12 @@ function startWatch(){
   watchId=navigator.geolocation.watchPosition(onPos,()=>showGpsTag('GPS débil…'),{enableHighAccuracy:true,maximumAge:1000,timeout:15000});
 }
 function onPos(pos){
-  const{latitude:lat,longitude:lng,speed,accuracy,altitude}=pos.coords;
+  const{latitude:rawLat,longitude:rawLng,speed,accuracy,altitude}=pos.coords;
+  const[lat,lng]=smoothGPS(rawLat,rawLng);
   const kmh=speed!=null?speed*3.6:0;
   if(altitude!=null)currentAlt=Math.round(altitude);
   currentPos={lat,lng};
   placeMarker(lat,lng,accuracy,pos.coords.heading);
-  // Centrar teniendo en cuenta la bottom sheet
   panToUser(lat,lng);
   if(isRecording&&!isPaused){
     if(lastPos)totalDist+=haversine(lastPos[0],lastPos[1],lat,lng);
@@ -1111,6 +1175,7 @@ function updateStats(kmh){
   document.getElementById('paceFill').style.width=Math.min(100,(kmh/(activityMode==='bike'?40:15))*100)+'%';
   checkSpeedAlert(kmh);
   checkAutoPause(kmh);
+  updateETA(totalDist,avg);
   drawSpeedGraph(speedLog,maxSpeed);
 }
 function startTimer(){
@@ -1563,6 +1628,7 @@ function renderHistory(){
         <div class="hcard-meta">
           <div class="hcard-title">${r.mode==='bike'?'En Bici':'A Pata'} · ${r.date} ${r.time}</div>
           <div class="hcard-sub">⚡ ${r.avgSpeed} km/h · 💨 ${r.maxSpeed} max · 🔥 ${r.cal} kcal</div>
+          ${r.note?`<div class="hcard-note">${r.note}</div>`:''}
         </div>
         <div class="hcard-right"><div class="hcard-km">${r.dist}</div><div class="hcard-time">km · ${r.duration}</div></div>
       </div>
@@ -1572,6 +1638,7 @@ function renderHistory(){
         <button class="hcard-btn" onclick='exportRoute(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>👥 Compartir</button>
         <button class="hcard-btn" onclick='startReplay(${JSON.stringify({coords:r.coords||[],dist:r.dist,duration:r.duration}).replace(/'/g,"&#39;")})'>▶ Replay</button>
         <button class="hcard-btn" onclick='followRoute(${JSON.stringify({coords:r.coords||[]}).replace(/'/g,"&#39;")})'>🔁 Seguir</button>
+        <button class="hcard-btn" onclick='openNoteModal(${r.id})'>📝 Nota</button>
         <button class="hcard-btn red" onclick='deleteActivity(${r.id})'>🗑️</button>
       </div>`;
     list.appendChild(c);
@@ -1582,7 +1649,7 @@ function renderHistory(){
 // MODALS / TABS / MODE
 // ════════════════════════════════
 function openSettings(){
-  renderAlertList();initNotifUI();loadProfile();initUnits();initSpeedAlert();initIntervalCfg();initAutoPause();initAlwaysOn();
+  renderAlertList();initNotifUI();loadProfile();initUnits();initSpeedAlert();initIntervalCfg();initAutoPause();initAlwaysOn();initVoice();
   const t=localStorage.getItem('pedaleTheme')||'auto';['auto','light','dark'].forEach(k=>{document.getElementById('theme'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.toggle('active',k===t);});
   const saved=localStorage.getItem('tomtomKey')||'';document.getElementById('tomtomKey').value=saved;
   openModal('settingsModal');
@@ -2293,6 +2360,124 @@ function renderLeaderboard(){
 }
 
 // ════════════════════════════════
+// FEEDBACK DE VOZ (Speech Synthesis)
+// ════════════════════════════════
+function speak(text){
+  if(localStorage.getItem('voiceOn')!=='1')return;
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='es-AR';u.rate=1.0;u.pitch=1.0;
+  // Buscar voz en español
+  const voices=speechSynthesis.getVoices();
+  const esVoice=voices.find(v=>v.lang.startsWith('es'));
+  if(esVoice)u.voice=esVoice;
+  speechSynthesis.speak(u);
+}
+function initVoice(){
+  const on=localStorage.getItem('voiceOn')==='1';
+  if(document.getElementById('voiceToggle'))
+    document.getElementById('voiceToggle').checked=on;
+}
+// Cargar voces async
+if('speechSynthesis' in window)
+  speechSynthesis.addEventListener('voiceschanged',()=>{});
+
+// ════════════════════════════════
+// GPS SUAVIZADO (Moving Average)
+// ════════════════════════════════
+const _gpsBuffer=[];
+const GPS_SMOOTH=4; // últimas N lecturas
+function smoothGPS(lat,lng){
+  _gpsBuffer.push([lat,lng]);
+  if(_gpsBuffer.length>GPS_SMOOTH)_gpsBuffer.shift();
+  const avgLat=_gpsBuffer.reduce((s,p)=>s+p[0],0)/_gpsBuffer.length;
+  const avgLng=_gpsBuffer.reduce((s,p)=>s+p[1],0)/_gpsBuffer.length;
+  return[avgLat,avgLng];
+}
+
+// ════════════════════════════════
+// TIEMPO ESTIMADO (ETA)
+// ════════════════════════════════
+let _etaTarget=0; // km objetivo
+function updateETA(dist,avgSpeed){
+  const badge=document.getElementById('etaBadge');
+  const text=document.getElementById('etaText');
+  if(!badge||!text)return;
+  // Buscar próximo aviso de distancia como target
+  const nextAlert=distAlerts.filter(a=>a.enabled&&a.km>dist).sort((a,b)=>a.km-b.km)[0];
+  if(!nextAlert||avgSpeed<0.5){badge.classList.remove('show');return;}
+  const remaining=nextAlert.km-dist;
+  const etaMin=Math.ceil((remaining/avgSpeed)*60);
+  text.textContent=`${nextAlert.km}km en ~${etaMin} min`;
+  badge.classList.add('show');
+}
+
+// ════════════════════════════════
+// NOTAS POR ACTIVIDAD
+// ════════════════════════════════
+let _pendingNoteId=null;
+function openNoteModal(id){
+  _pendingNoteId=id;
+  const rec=historyData.find(r=>r.id===id)||{note:''};
+  const ta=document.getElementById('noteText');
+  if(ta){ta.value=rec.note||'';updateNoteChars();}
+  openModal('notesModal');
+}
+function updateNoteChars(){
+  const ta=document.getElementById('noteText');
+  const el=document.getElementById('noteChars');
+  if(ta&&el){el.textContent=ta.value.length;ta.oninput=()=>el.textContent=ta.value.length;}
+}
+function saveNote(){
+  const text=document.getElementById('noteText')?.value.trim()||'';
+  const rec=historyData.find(r=>r.id===_pendingNoteId);
+  if(rec){rec.note=text;localStorage.setItem('pedaleHistory',JSON.stringify(historyData));renderHistory();}
+  closeModal('notesModal');
+  showToast(text?'📝 Nota guardada':'📝 Nota eliminada');
+}
+
+// ════════════════════════════════
+// ONBOARDING — primera vez
+// ════════════════════════════════
+const ONBOARD_STEPS=[
+  {icon:'🗺️',title:'EL MAPA ES TU RUTA',desc:'Cuando iniciás, el mapa traza tu recorrido en tiempo real. El marcador naranja muestra tu posición y dirección.'},
+  {icon:'▶',title:'INICIAR ES FÁCIL',desc:'Tocá INICIAR para empezar a grabar. Podés pausar y continuar cuando quieras.'},
+  {icon:'🏆',title:'GANATE LOGROS',desc:'Completá distancias, salí bajo la lluvia o de madrugada para desbloquear los 20 logros disponibles.'},
+  {icon:'🎵',title:'MÚSICA MIENTRAS PEDALEÁS',desc:'Tocá el botón 🎵 en el mapa para abrir Spotify, YouTube Music o tus propios archivos MP3.'},
+  {icon:'⚙️',title:'CONFIGURÁ A TU GUSTO',desc:'En el ícono ⚙️ podés ajustar el peso, las unidades, el modo oscuro, avisos de distancia y mucho más.'},
+];
+let _obStep=0;
+
+function startOnboarding(){
+  if(localStorage.getItem('obDone'))return;
+  _obStep=0;renderOnboardStep();
+  document.getElementById('onboarding').classList.add('show');
+}
+function renderOnboardStep(){
+  const s=ONBOARD_STEPS[_obStep];
+  if(!s)return;
+  document.getElementById('obStep').textContent=`Paso ${_obStep+1} de ${ONBOARD_STEPS.length}`;
+  document.getElementById('obIcon').textContent=s.icon;
+  document.getElementById('obTitle').textContent=s.title;
+  document.getElementById('obDesc').textContent=s.desc;
+  const btn=document.querySelector('.onboard-next');
+  if(btn)btn.textContent=_obStep===ONBOARD_STEPS.length-1?'¡EMPEZAR! 🚴':'SIGUIENTE →';
+  // Dots
+  const dots=document.getElementById('obDots');
+  if(dots)dots.innerHTML=ONBOARD_STEPS.map((_,i)=>`<div class="onboard-dot ${i===_obStep?'active':''}"></div>`).join('');
+}
+function nextOnboardStep(){
+  _obStep++;
+  if(_obStep>=ONBOARD_STEPS.length){finishOnboarding();return;}
+  renderOnboardStep();
+}
+function finishOnboarding(){
+  localStorage.setItem('obDone','1');
+  document.getElementById('onboarding').classList.remove('show');
+}
+
+// ════════════════════════════════
 // BOOT
 // ════════════════════════════════
 renderHistory();
@@ -2304,9 +2489,11 @@ initSpeedAlert();
 initIntervalCfg();
 initAutoPause();
 initAlwaysOn();
+initVoice();
 initMap();
 renderTotalStats();
 handleShareLink();
+startOnboarding();
 createPWAManifest();
 updateOnlineStatus();
 registerSW();
