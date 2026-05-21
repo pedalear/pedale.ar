@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1f244c">
+<meta name="description" content="Pedale.AR — Seguí tus recorridos en bici o corriendo. App gratuita, sin publicidad, hecha en Argentina.">
+<title>Pedale.AR — Andá sin límites</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --orange:#f79d23;--red:#ea580c;--pink:#dd3256;
+  --purple:#592452;--navy:#1f244c;--white:#ffffff;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
+
+/* ── HERO ── */
+.hero{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:40px 24px 60px}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(180deg,var(--orange) 0%,var(--red) 30%,var(--pink) 55%,var(--purple) 72%,var(--navy) 100%);z-index:0}
+/* Sunset stripes */
+.stripe{position:absolute;left:0;right:0;height:4px;opacity:.3}
+.s1{top:30%;background:var(--red)}
+.s2{top:45%;background:var(--pink)}
+.s3{top:58%;background:var(--purple)}
+
+/* Wheel silhouette */
+.wheel-wrap{position:absolute;bottom:38%;left:50%;transform:translateX(-50%);z-index:1;width:min(340px,85vw)}
+.wheel-svg{width:100%;opacity:.85}
+
+/* Hero text */
+.hero-content{position:relative;z-index:2;text-align:center;margin-top:auto;padding-top:52vh}
+.hero-logo{font-family:'DM Sans',sans-serif;font-size:clamp(48px,12vw,80px);font-weight:800;letter-spacing:-1px;line-height:1}
+.hero-logo .dot{color:var(--pink)}
+.hero-tagline{font-size:clamp(16px,4vw,22px);opacity:.85;margin-top:10px;font-weight:400;letter-spacing:.3px}
+.hero-sub{font-size:14px;opacity:.6;margin-top:6px}
+.cta-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:32px}
+.btn-cta{display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:16px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;text-decoration:none;transition:all .2s;cursor:pointer;border:none}
+.btn-primary-cta{background:var(--white);color:var(--navy)}
+.btn-primary-cta:hover{transform:scale(1.03)}
+.btn-secondary-cta{background:rgba(255,255,255,.15);color:var(--white);border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(8px)}
+.btn-secondary-cta:hover{background:rgba(255,255,255,.25)}
+.scroll-hint{margin-top:40px;font-size:12px;opacity:.5;letter-spacing:1px;text-transform:uppercase;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ── FEATURES ── */
+.section{padding:72px 24px;max-width:520px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange);margin-bottom:12px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,52px);letter-spacing:1px;line-height:1.05;margin-bottom:16px}
+.section-desc{font-size:15px;opacity:.7;line-height:1.7}
+
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}
+.feat-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;transition:all .2s}
+.feat-card:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.feat-icon{font-size:28px;margin-bottom:10px}
+.feat-name{font-weight:700;font-size:14px;margin-bottom:4px}
+.feat-desc{font-size:12px;opacity:.6;line-height:1.5}
+.feat-card.wide{grid-column:span 2}
+
+/* ── STATS BAR ── */
+.stats-bar{background:linear-gradient(135deg,var(--orange),var(--red),var(--pink));padding:40px 24px;text-align:center}
+.stats-row{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;max-width:500px;margin:0 auto}
+.stat-item{text-align:center}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1}
+.stat-l{font-size:12px;opacity:.8;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* ── HOW IT WORKS ── */
+.steps{display:flex;flex-direction:column;gap:24px;margin-top:36px}
+.step{display:flex;align-items:flex-start;gap:16px}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--orange);line-height:1;flex-shrink:0;width:36px}
+.step-text{}
+.step-title{font-weight:700;font-size:15px;margin-bottom:4px}
+.step-desc{font-size:13px;opacity:.6;line-height:1.6}
+
+/* ── PHONE MOCKUP ── */
+.phone-section{padding:60px 24px;text-align:center;overflow:hidden}
+.phone-mock{display:inline-block;background:var(--navy);border:3px solid rgba(255,255,255,.15);border-radius:36px;padding:12px;box-shadow:0 20px 80px rgba(0,0,0,.5);max-width:240px;width:100%}
+.phone-screen{background:linear-gradient(135deg,var(--orange),var(--red),var(--pink),var(--purple),var(--navy));border-radius:26px;aspect-ratio:9/16;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px}
+.mock-speed{font-family:'Bebas Neue',sans-serif;font-size:72px;color:#fff;line-height:1}
+.mock-unit{font-size:13px;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase}
+.mock-dist{font-family:'Bebas Neue',sans-serif;font-size:36px;color:rgba(255,255,255,.8);line-height:1;margin-top:8px}
+.mock-bar{height:3px;width:80%;background:rgba(255,255,255,.2);border-radius:2px;margin-top:16px}
+.mock-fill{height:100%;width:65%;background:var(--orange);border-radius:2px}
+
+/* ── INSTALL ── */
+.install-section{padding:72px 24px 100px;text-align:center;background:linear-gradient(180deg,var(--navy),#0d0f24)}
+.install-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,52px);margin-bottom:12px}
+.install-sub{font-size:15px;opacity:.6;margin-bottom:32px;line-height:1.6}
+.install-steps{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:36px;text-align:left;max-width:320px;margin-left:auto;margin-right:auto}
+.install-step{display:flex;align-items:center;gap:12px;font-size:14px;opacity:.8}
+.install-step-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── FOOTER ── */
+footer{padding:24px;text-align:center;border-top:1px solid rgba(255,255,255,.08);font-size:12px;opacity:.5}
+footer a{color:var(--orange);text-decoration:none}
+.free-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(247,157,35,.15);border:1px solid rgba(247,157,35,.3);border-radius:20px;padding:6px 16px;font-size:13px;color:var(--orange);font-weight:600;margin-bottom:20px}
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="stripe s1"></div>
+  <div class="stripe s2"></div>
+  <div class="stripe s3"></div>
+
+  <!-- Wheel SVG -->
+  <div class="wheel-wrap">
+    <svg class="wheel-svg" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+      <clipPath id="topClip"><rect x="0" y="0" width="400" height="220"/></clipPath>
+      <g clip-path="url(#topClip)">
+        <circle cx="200" cy="210" r="190" fill="none" stroke="#1f244c" stroke-width="18"/>
+        <!-- Spokes -->
+        <g stroke="#1f244c" stroke-width="5" stroke-linecap="round">
+          <line x1="200" y1="210" x2="200" y2="22"/>
+          <line x1="200" y1="210" x2="378" y2="135"/>
+          <line x1="200" y1="210" x2="355" y2="36"/>
+          <line x1="200" y1="210" x2="22" y2="135"/>
+          <line x1="200" y1="210" x2="45" y2="36"/>
+          <line x1="200" y1="210" x2="312" y2="175"/>
+          <line x1="200" y1="210" x2="88" y2="175"/>
+          <line x1="200" y1="210" x2="290" y2="58"/>
+          <line x1="200" y1="210" x2="110" y2="58"/>
+          <line x1="200" y1="210" x2="380" y2="195"/>
+          <line x1="200" y1="210" x2="20" y2="195"/>
+        </g>
+        <circle cx="200" cy="210" r="16" fill="#1f244c"/>
+        <circle cx="200" cy="210" r="8" fill="#dd3256"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-logo">Pedale<span class="dot">.</span>AR</div>
+    <div class="hero-tagline">Andá sin límites 🚴</div>
+    <div class="hero-sub">Gratis · Sin publicidad · Hecha en Rafaela, Argentina</div>
+    <div class="cta-wrap">
+      <div class="free-badge">✨ 100% gratuita</div>
+      <a class="btn-cta btn-primary-cta" href="./index.html">
+        📲 Abrir la app
+      </a>
+      <a class="btn-cta btn-secondary-cta" href="https://cafecito.app/pedalear" target="_blank">
+        ☕ Invitame un café
+      </a>
+    </div>
+    <div class="scroll-hint">↓ conocé más ↓</div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="section">
+  <div class="section-label">Todo lo que necesitás</div>
+  <div class="section-title">Una app de verdad, sin vueltas</div>
+  <div class="section-desc">Todo lo que necesitás para salir a rodar, sin pagar suscripción ni ver publicidades.</div>
+
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🗺️</div>
+      <div class="feat-name">Mapa en tiempo real</div>
+      <div class="feat-desc">Trazá tu ruta sobre el mapa mientras pedaleás</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-name">Velocidad y distancia</div>
+      <div class="feat-desc">Km/h, km recorridos, ritmo, calorías y más</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌤️</div>
+      <div class="feat-name">Clima en el mapa</div>
+      <div class="feat-desc">Sol, lluvia, nieve o tormenta — te lo muestra en tiempo real</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🚦</div>
+      <div class="feat-name">Tráfico en vivo</div>
+      <div class="feat-desc">Capa de tránsito sobre el mapa para elegir mejor ruta</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🏆</div>
+      <div class="feat-name">Logros</div>
+      <div class="feat-desc">20 badges por distancia, velocidad, clima y más</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🎵</div>
+      <div class="feat-name">Música integrada</div>
+      <div class="feat-desc">Spotify, YouTube Music o tus propios MP3</div>
+    </div>
+    <div class="feat-card wide">
+      <div class="feat-icon">👥</div>
+      <div class="feat-name">Compartí tus rutas</div>
+      <div class="feat-desc">Exportá tu recorrido como código y mandáselo a un amigo para que lo vea en su mapa. Sin servidores, sin cuentas.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="stats-bar">
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-n">100%</div><div class="stat-l">Gratuita</div></div>
+    <div class="stat-item"><div class="stat-n">0</div><div class="stat-l">Publicidades</div></div>
+    <div class="stat-item"><div class="stat-n">20</div><div class="stat-l">Logros</div></div>
+  </div>
+</div>
+
+<!-- ══ PHONE MOCKUP ══ -->
+<section class="phone-section">
+  <div class="phone-mock">
+    <div class="phone-screen">
+      <div style="font-size:11px;opacity:.6;letter-spacing:1px;text-transform:uppercase">Velocidad</div>
+      <div class="mock-speed">28.4</div>
+      <div class="mock-unit">km/h</div>
+      <div style="height:1px;width:60%;background:rgba(255,255,255,.15);margin:10px 0"></div>
+      <div style="display:flex;gap:24px">
+        <div style="text-align:center"><div class="mock-dist">12.6</div><div style="font-size:10px;opacity:.6">km</div></div>
+        <div style="text-align:center"><div class="mock-dist">45:22</div><div style="font-size:10px;opacity:.6">tiempo</div></div>
+      </div>
+      <div class="mock-bar"><div class="mock-fill"></div></div>
+      <div style="font-size:10px;opacity:.5;margin-top:4px">Ritmo: 4:30 min/km</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="section">
+  <div class="section-label">Cómo funciona</div>
+  <div class="section-title">En 3 pasos arrancás</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <div class="step-title">Abrís desde Chrome</div>
+        <div class="step-desc">Entrás a la URL desde el navegador de tu celu. No hay nada que instalar de una tienda.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <div class="step-title">La agregás a tu pantalla</div>
+        <div class="step-desc">Menú ⋮ → "Agregar a pantalla de inicio". Queda como app nativa con su ícono.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <div class="step-title">Salís a pedalear</div>
+        <div class="step-desc">Tocás INICIAR y listo. El GPS empieza a trazar tu ruta en tiempo real.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ INSTALL CTA ══ -->
+<section class="install-section">
+  <div class="free-badge">📲 Instalala hoy</div>
+  <div class="install-title">¿Arrancamos?</div>
+  <div class="install-sub">Gratis, sin cuenta, sin datos personales.<br>Solo pedaleá.</div>
+  <a class="btn-cta btn-primary-cta" href="./index.html" style="display:inline-flex;margin:0 auto">
+    🚴 Abrir Pedale.AR
+  </a>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  Hecho con ❤️ en Rafaela, Santa Fe, Argentina &nbsp;·&nbsp;
+  <a href="https://cafecito.app/pedalear" target="_blank">☕ Cafecito</a> &nbsp;·&nbsp;
+  <a href="mailto:maurikrause1983@gmail.com">Contacto</a>
+</footer>
+
+</body>
+</html>
