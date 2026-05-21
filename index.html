@@ -381,6 +381,59 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 [data-theme="dark"] .icon-btn{background:#252d3d;border-color:rgba(255,255,255,.12);color:#f0f4ff}
 [data-theme="dark"] .bottom-sheet{box-shadow:0 -4px 32px rgba(0,0,0,.4)}
 [data-theme="dark"] .toast{background:#e8eaf6;color:#1f244c}
+/* ── SHARED ACTIVITY MODAL ── */
+.shared-act-card{background:linear-gradient(135deg,#f79d23,#ea580c,#dd3256,#592452);border-radius:18px;padding:20px;color:#fff;text-align:center;margin-bottom:16px}
+.shared-act-dist{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;letter-spacing:2px}
+.shared-act-mode{font-size:13px;opacity:.75;margin-bottom:4px;letter-spacing:1px;text-transform:uppercase}
+.shared-act-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.shared-act-stat{background:rgba(0,0,0,.2);border-radius:10px;padding:8px}
+.shared-act-val{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1}
+.shared-act-lbl{font-size:9px;opacity:.7;text-transform:uppercase;letter-spacing:1px}
+
+/* ── WEATHER FORECAST MODAL ── */
+.forecast-row{display:flex;gap:10px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.forecast-row::-webkit-scrollbar{display:none}
+.forecast-card{flex-shrink:0;width:72px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
+.forecast-hour{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:4px}
+.forecast-icon{font-size:22px;line-height:1;margin:4px 0}
+.forecast-temp{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);line-height:1}
+.forecast-rain{font-size:9px;color:var(--accent);font-weight:700;margin-top:2px}
+.weather-badge-tap{cursor:pointer}
+
+/* ── INTERVAL TRAINING ── */
+.interval-cfg{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:8px}
+.interval-cfg-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.interval-cfg-row:last-child{margin-bottom:0}
+.interval-num-wrap{display:flex;align-items:center;gap:6px}
+.int-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text)}
+.int-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);min-width:32px;text-align:center}
+/* Interval indicator in active view */
+.interval-indicator{display:none;align-items:center;justify-content:center;gap:8px;padding:8px 0 2px}
+.interval-indicator.show{display:flex}
+.int-phase{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px}
+.int-phase.fast{color:#ea580c}
+.int-phase.slow{color:#60a5fa}
+.int-countdown{font-size:13px;color:var(--muted);font-weight:600}
+
+/* ── REPLAY CONTROLS ── */
+.replay-controls{position:absolute;bottom:148px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:8px 16px;display:none;align-items:center;gap:12px;box-shadow:var(--shadow);white-space:nowrap}
+.replay-controls.show{display:flex}
+.replay-btn{height:32px;padding:0 14px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.replay-btn.stop{background:#fee2e2;color:#dc2626}
+.replay-progress{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent)}
+
+/* ── LEADERBOARD ── */
+.lb-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:10px}
+.lb-title{font-weight:700;font-size:13px;margin-bottom:10px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-pos{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);width:28px;flex-shrink:0}
+.lb-pos.first{color:#f79d23}
+.lb-pos.second{color:#9ca3af}
+.lb-pos.third{color:#ea580c}
+.lb-name{flex:1;font-weight:600;font-size:13px}
+.lb-km{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent)}
+
 
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px}
@@ -423,11 +476,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 <div class="screen map-screen active" id="screen-map">
   <div id="map"></div>
   <div id="weatherOverlay"></div>
-  <div class="weather-badge" id="weatherBadge">
+  <div class="weather-badge weather-badge-tap" id="weatherBadge" onclick="openForecast()">
     <span class="wb-icon" id="wbIcon">🌤️</span>
     <div><div class="wb-temp" id="wbTemp">--°C</div><div class="wb-desc" id="wbDesc">cargando…</div></div>
   </div>
   <div class="offline-badge" id="offlineBadge">📵 Sin conexión · mapa en caché</div>
+  <div class="replay-controls" id="replayControls">
+    <span class="replay-progress" id="replayProgress">▶ Replay</span>
+    <button class="replay-btn stop" onclick="stopReplay()">⏹ Detener</button>
+  </div>
   <div class="follow-badge" id="followBadge"><div class="follow-dot"></div>Siguiendo ruta</div>
   <div class="gps-tag" id="gpsTag"><div class="gps-pulse"></div><span id="gpsTagText">Buscando GPS…</span></div>
   <button class="traffic-btn" id="trafficBtn" onclick="toggleTraffic()">🚦</button>
@@ -449,6 +506,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
         <div class="live-metric"><div class="lm-val big" id="lmSpeed">0.0</div><div class="lm-lbl">km/h</div></div>
         <div class="live-metric"><div class="lm-val" id="lmDist">0.00</div><div class="lm-lbl">km</div></div>
       </div>
+      <div class="interval-indicator" id="intervalIndicator"><span class="int-phase fast" id="intPhaseLabel">🔥 RÁPIDO</span><span class="int-countdown" id="intCountdown">2:00</span></div>
       <div class="street-name" id="streetName"></div>
       <div class="active-controls">
         <div class="rec-dot on" id="recDot"></div>
@@ -463,6 +521,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 
 <!-- STATS SCREEN -->
 <div class="screen stats-screen" id="screen-stats">
+  <!-- Total stats hero -->
+  <div class="total-stats-hero" id="totalStatsHero">
+    <div class="total-stats-title">📊 Tus totales</div>
+    <div class="total-stats-grid">
+      <div class="ts-item"><div class="ts-val" id="tsKm">0</div><div class="ts-lbl">km totales</div></div>
+      <div class="ts-item"><div class="ts-val" id="tsRides">0</div><div class="ts-lbl">salidas</div></div>
+      <div class="ts-item"><div class="ts-val" id="tsTime">0h</div><div class="ts-lbl">tiempo total</div></div>
+      <div class="ts-item"><div class="ts-val" id="tsCal">0</div><div class="ts-lbl">kcal quemadas</div></div>
+    </div>
+    <div class="records-row">
+      <div class="record-item"><div class="record-val" id="recMaxSpeed">--</div><div class="record-lbl">⚡ Vel. máx</div></div>
+      <div class="record-item"><div class="record-val" id="recMaxDist">--</div><div class="record-lbl">📍 Mayor distancia</div></div>
+      <div class="record-item"><div class="record-val" id="recStreak">--</div><div class="record-lbl">🔥 Racha días</div></div>
+    </div>
+  </div>
   <div class="timer-hero"><div class="timer-hero-val" id="statTimer">00:00:00</div><div class="timer-hero-lbl">Tiempo activo</div></div>
   <div class="stats-grid">
     <div class="sc"><div class="sc-icon">⚡</div><div class="sc-lbl">Velocidad</div><div class="sc-val em" id="statSpeed">0.0</div><div class="sc-unit">km/h actual</div></div>
@@ -508,7 +581,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     </div>
   </div>
   <div id="friendsList" style="display:flex;flex-direction:column;gap:8px;margin-top:2px"></div>
+  <div id="leaderboard"></div>
   <div class="sec-title" style="margin-top:8px">📋 Mis actividades</div>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button class="export-btn csv" onclick="exportHistory('csv')">📄 Exportar CSV</button>
+    <button class="export-btn json" onclick="exportHistory('json')">📦 Exportar JSON</button>
+  </div>
   <div class="summary-row" id="summaryRow" style="display:none"></div>
   <div id="histList" style="display:flex;flex-direction:column;gap:10px;flex:1"></div>
   <div class="empty-state" id="emptyHist"><div class="ei">🚴</div><p>Todavía no hay actividades. ¡Salí a pedalear!</p></div>
@@ -525,6 +603,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       <button class="theme-pill" id="themeAuto" onclick="setTheme('auto')">⚙️ Auto</button>
       <button class="theme-pill" id="themeLight" onclick="setTheme('light')">☀️ Claro</button>
       <button class="theme-pill" id="themeDark" onclick="setTheme('dark')">🌙 Oscuro</button>
+    </div>
+
+    <div class="sec-div">📏 Unidades</div>
+    <div class="units-row">
+      <button class="unit-pill active" id="unitKm" onclick="setUnits('metric')">🇦🇷 km / km·h</button>
+      <button class="unit-pill" id="unitMi" onclick="setUnits('imperial')">🇺🇸 mi / mph</button>
+    </div>
+
+    <div class="sec-div">⚡ Aviso de velocidad mínima</div>
+    <div class="cfg-row">
+      <div class="cfg-desc">Avisar si voy más lento que<small>Útil para mantener el ritmo en bici</small></div>
+      <label class="toggle"><input type="checkbox" id="speedAlertToggle" onchange="saveSpeedAlert()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+    </div>
+    <div class="weight-slider-wrap" id="speedAlertRow" style="display:none;margin-top:8px">
+      <div class="weight-slider-label">
+        <div class="weight-slider-title">⚡ Velocidad mínima</div>
+        <div class="weight-slider-val" id="speedAlertVal">15 km/h</div>
+      </div>
+      <input type="range" min="5" max="50" value="15" id="speedAlertSlider"
+        style="width:100%" oninput="updateSpeedAlert(this.value)">
+      <div class="weight-hints"><span>5 km/h</span><span>27 km/h</span><span>50 km/h</span></div>
     </div>
 
     <div class="sec-div">👤 Tu perfil</div>
@@ -560,6 +659,53 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       <input class="num-inp" id="newAlertKm" type="number" placeholder="ej. 15 km" min="0.1" max="300" step="0.1">
       <button class="add-btn-sm" onclick="addAlert()">+ AGREGAR</button>
     </div>
+    <div class="sec-div">🏁 Entrenamiento por intervalos</div>
+    <div class="cfg-row">
+      <div class="cfg-desc">Activar intervalos<small>Alterna tramos rápidos y lentos</small></div>
+      <label class="toggle"><input type="checkbox" id="intervalToggle" onchange="saveIntervalCfg()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+    </div>
+    <div class="interval-cfg" id="intervalCfg" style="display:none">
+      <div class="interval-cfg-row">
+        <div class="cfg-desc" style="flex:1">🔥 Tramo rápido</div>
+        <div class="interval-num-wrap">
+          <button class="int-btn" onclick="adjInterval('fast',-1)">−</button>
+          <div class="int-val" id="intFastVal">2</div>
+          <button class="int-btn" onclick="adjInterval('fast',1)">+</button>
+          <span style="font-size:11px;color:var(--muted)">min</span>
+        </div>
+      </div>
+      <div class="interval-cfg-row">
+        <div class="cfg-desc" style="flex:1">💨 Recupero</div>
+        <div class="interval-num-wrap">
+          <button class="int-btn" onclick="adjInterval('slow',-1)">−</button>
+          <div class="int-val" id="intSlowVal">1</div>
+          <button class="int-btn" onclick="adjInterval('slow',1)">+</button>
+          <span style="font-size:11px;color:var(--muted)">min</span>
+        </div>
+      </div>
+      <div class="interval-cfg-row">
+        <div class="cfg-desc" style="flex:1">🔁 Repeticiones</div>
+        <div class="interval-num-wrap">
+          <button class="int-btn" onclick="adjInterval('reps',-1)">−</button>
+          <div class="int-val" id="intRepsVal">5</div>
+          <button class="int-btn" onclick="adjInterval('reps',1)">+</button>
+          <span style="font-size:11px;color:var(--muted)">x</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-div">⏸ Auto-pausa</div>
+    <div class="cfg-row">
+      <div class="cfg-desc">Auto-pausar si no me muevo<small>Pausa sola después de 10s sin movimiento</small></div>
+      <label class="toggle"><input type="checkbox" id="autoPauseToggle" onchange="localStorage.setItem('autoPauseOn',this.checked?'1':'0')"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+    </div>
+
+    <div class="sec-div">📱 Pantalla siempre encendida</div>
+    <div class="cfg-row">
+      <div class="cfg-desc">Mantener pantalla encendida siempre<small>No solo al grabar — gasta más batería</small></div>
+      <label class="toggle"><input type="checkbox" id="alwaysOnToggle" onchange="setAlwaysOn(this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+    </div>
+
     <div class="sec-div">🔔 Tipo de aviso</div>
     <div class="cfg-row"><div class="cfg-desc">Vibración<small>Al completar cada distancia</small></div><label class="toggle"><input type="checkbox" id="vibToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
     <div class="cfg-row"><div class="cfg-desc">Sonido (beep)<small>Triple pitido al llegar</small></div><label class="toggle"><input type="checkbox" id="soundToggle" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
@@ -595,6 +741,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div class="share-primary">
       <button class="sa-primary sa-wa" onclick="shareImageNative('whatsapp')"><span class="sa-icon">💬</span><span class="sa-name">WhatsApp</span><span class="sa-sub">Estado</span></button>
       <button class="sa-primary sa-ig" onclick="shareImageNative('instagram')"><span class="sa-icon">📸</span><span class="sa-name">Instagram</span><span class="sa-sub">Historias</span></button>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px">🔗 Link compartible</div>
+      <div class="share-url-row">
+        <input class="share-url-inp" id="shareUrlInp" readonly placeholder="Generando link…">
+        <button class="share-url-copy" onclick="copyShareUrl()">COPIAR</button>
+      </div>
     </div>
     <div class="share-secondary">
       <button class="sa-sec all" onclick="shareImageNative('all')">↗ Todas las apps</button>
@@ -636,6 +789,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       <div class="vol-row"><span>🔈</span><input type="range" min="0" max="100" value="80" id="volSlider" oninput="setVol(this.value)"><span>🔊</span></div>
       <label class="upload-btn">📂 Subir archivos de audio<input type="file" accept="audio/*" multiple style="display:none" onchange="loadFiles(this)"></label>
     </div>
+  </div>
+</div>
+
+<!-- SHARED ACTIVITY MODAL -->
+<div class="modal-backdrop" id="sharedModal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚴 Actividad compartida</div>
+    <div id="sharedContent"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="closeModal('sharedModal')">✓ Cerrar</button>
+  </div>
+</div>
+
+<!-- FORECAST MODAL -->
+<div class="modal-backdrop" id="forecastModal" onclick="closeModal('forecastModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="forecastTitle">🌤️ Próximas horas</div>
+    <div class="forecast-row" id="forecastRow"></div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:4px">Datos: Open-Meteo · actualizado al abrir</div>
   </div>
 </div>
 
@@ -836,6 +1009,7 @@ function startActivity(){
   document.getElementById('activeView').style.display='flex';
   document.getElementById('recDot').className='rec-dot on';
   startWatch();startTimer();acquireWakeLock();
+  startIntervals();
   showToast(activityMode==='bike'?'🚴 ¡A pedalear!':'🏃 ¡A correr!');
 }
 function pauseActivity(){
@@ -858,6 +1032,8 @@ function stopActivity(){
   clearInterval(timerInterval);
   if(watchId){navigator.geolocation.clearWatch(watchId);watchId=null;}
   releaseWakeLock();
+  stopIntervals();
+  clearTimeout(_autoPauseTimer);
   const elapsed=getElapsed();
   const avg=speedSamples.length?speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length:0;
   const pace=avg>.5?60/avg:null;
@@ -933,6 +1109,8 @@ function updateStats(kmh){
   document.getElementById('statCal').textContent=cal;
   document.getElementById('statAlt').textContent=currentAlt!=null?currentAlt:'--';
   document.getElementById('paceFill').style.width=Math.min(100,(kmh/(activityMode==='bike'?40:15))*100)+'%';
+  checkSpeedAlert(kmh);
+  checkAutoPause(kmh);
   drawSpeedGraph(speedLog,maxSpeed);
 }
 function startTimer(){
@@ -1237,7 +1415,15 @@ function shareCurrentActivity(){
     time:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
     weather:document.getElementById('wbDesc').textContent});
 }
-function openShareModal(rec){if(!rec)return;currentShareRecord=rec;_cachedBlob=null;drawShareCard(rec);document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;},'image/png');openModal('shareModal');}
+function openShareModal(rec){
+  if(!rec)return;currentShareRecord=rec;_cachedBlob=null;drawShareCard(rec);
+  document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;},'image/png');
+  // Generar URL compartible
+  const url=generateShareUrl(rec);
+  const inp=document.getElementById('shareUrlInp');
+  if(inp)inp.value=url;
+  openModal('shareModal');
+}
 function buildShareText(rec){return`🚴 PEDALE.AR\n${rec.mode==='bike'?'En Bici':'A Pata'} · ${rec.date}\n\n📍 ${rec.dist} km\n⏱ ${rec.duration}\n⚡ ${rec.avgSpeed} km/h promedio\n💨 ${rec.maxSpeed} km/h máxima\n🔥 ${rec.cal} kcal\n🌤 ${(rec.weather||'').split('·')[0].trim()}\n\n#pedaleAR #${rec.mode==='bike'?'EnBici':'APata'}`;}
 function getBlob(){return new Promise(r=>{if(_cachedBlob){r(_cachedBlob);return;}document.getElementById('shareCanvas').toBlob(b=>{_cachedBlob=b;r(b);},'image/png');});}
 async function shareImageNative(hint){
@@ -1251,20 +1437,96 @@ async function shareImageNative(hint){
 function downloadCard(){const a=document.createElement('a');a.href=document.getElementById('shareCanvas').toDataURL('image/png');a.download='pedalear.png';a.click();showToast('📥 Imagen guardada');}
 async function copyText(){const rec=currentShareRecord;if(!rec)return;try{await navigator.clipboard.writeText(buildShareText(rec));showToast('📋 Texto copiado!');}catch(e){}}
 function drawShareCard(rec){
-  const canvas=document.getElementById('shareCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
-  const gr=ctx.createLinearGradient(0,0,W,H);gr.addColorStop(0,'#f79d23');gr.addColorStop(0.35,'#ea580c');gr.addColorStop(0.65,'#dd3256');gr.addColorStop(1,'#1f244c');
-  ctx.fillStyle=gr;rRect(ctx,0,0,W,H,18);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.04)';for(let i=0;i<50;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random()*22+4;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
-  ctx.fillStyle='rgba(255,255,255,.14)';ctx.beginPath();rRect(ctx,22,20,190,42,10);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 24px Bebas Neue,sans-serif';ctx.fillText('PEDALE.AR',34,50);
-  ctx.font='46px sans-serif';ctx.fillText(rec.mode==='bike'?'🚴':'🏃',26,132);
-  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='500 12px DM Sans,sans-serif';ctx.fillText('DISTANCIA',94,108);
-  ctx.fillStyle='#fff';ctx.font='bold 74px Bebas Neue,sans-serif';ctx.fillText(rec.dist,88,175);
-  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='bold 18px Bebas Neue,sans-serif';ctx.fillText('KM',92+ctx.measureText(rec.dist).width+6,175);
-  ctx.fillStyle='rgba(255,255,255,.11)';ctx.beginPath();rRect(ctx,18,200,W-36,108,14);ctx.fill();
-  [{label:'⏱',val:rec.duration,sub:'TIEMPO'},{label:'⚡',val:rec.avgSpeed+' km/h',sub:'PROMEDIO'},{label:'💨',val:rec.maxSpeed+' km/h',sub:'MÁXIMA'},{label:'🔥',val:rec.cal+' kcal',sub:'CALORÍAS'}]
-    .forEach((s,i)=>{const x=18+(i*(W-36)/4)+8;ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='11px sans-serif';ctx.fillText(s.label,x+2,224);ctx.fillStyle='#fff';ctx.font='bold 16px DM Sans,sans-serif';ctx.fillText(s.val,x,252);ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px DM Sans,sans-serif';ctx.fillText(s.sub,x,270);});
-  ctx.fillStyle='rgba(255,255,255,.32)';ctx.font='11px DM Sans,sans-serif';ctx.fillText(`${rec.date} ${rec.time}  ·  ${(rec.weather||'').split('·')[0].trim()}`,24,H-14);
+  const canvas=document.getElementById('shareCanvas');
+  // Formato más alto para mejor legibilidad
+  canvas.width=600;canvas.height=400;
+  const ctx=canvas.getContext('2d'),W=600,H=400;
+
+  // ── Fondo sunset ──
+  const gr=ctx.createLinearGradient(0,0,W,H);
+  gr.addColorStop(0,'#f79d23');gr.addColorStop(.3,'#ea580c');
+  gr.addColorStop(.6,'#dd3256');gr.addColorStop(1,'#1f244c');
+  ctx.fillStyle=gr;rRect(ctx,0,0,W,H,20);ctx.fill();
+
+  // ── Textura sutil ──
+  ctx.fillStyle='rgba(0,0,0,.08)';
+  for(let i=0;i<60;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random()*30+5;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+
+  // ── Logo (top left) ──
+  const logoImg=new Image();
+  logoImg.src='data:image/png;base64,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';
+  const drawRest=()=>{
+    // ── Header row: logo + nombre + fecha ──
+    try{ctx.drawImage(logoImg,22,18,52,52);}catch(e){}
+    ctx.fillStyle='#fff';
+    ctx.font='800 20px DM Sans,sans-serif';ctx.textBaseline='top';ctx.textAlign='left';
+    ctx.fillText('Pedale.AR',84,24);
+    ctx.fillStyle='rgba(255,255,255,.65)';
+    ctx.font='400 12px DM Sans,sans-serif';
+    ctx.fillText((rec.mode==='bike'?'🚴 En Bici':'🏃 A Pata')+' · '+rec.date+' '+rec.time,84,48);
+
+    // ── Línea divisoria ──
+    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(22,82);ctx.lineTo(W-22,82);ctx.stroke();
+
+    // ── Distancia — número grande ──
+    ctx.fillStyle='rgba(255,255,255,.55)';
+    ctx.font='700 11px DM Sans,sans-serif';ctx.letterSpacing='2px';
+    ctx.fillText('DISTANCIA',24,100);
+    ctx.fillStyle='#fff';
+    ctx.font='800 86px Bebas Neue,sans-serif';ctx.letterSpacing='2px';
+    ctx.textBaseline='top';
+    ctx.fillText(rec.dist,20,108);
+    // Unidad
+    const distW=ctx.measureText(rec.dist).width;
+    ctx.fillStyle='rgba(255,255,255,.7)';
+    ctx.font='700 28px Bebas Neue,sans-serif';
+    ctx.fillText('KM',26+distW,138);
+
+    // ── Ruta sketch (si hay coords) ──
+    if(rec.coords&&rec.coords.length>2){
+      const coords=rec.coords;
+      const lats=coords.map(c=>c[0]),lngs=coords.map(c=>c[1]);
+      const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+      const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+      const padX=20,padY=20;
+      const rw=200,rh=120,rx=W-rw-20,ry=88;
+      const scaleX=(c)=>rx+padX+(c-minLng)/(maxLng-minLng||1)*(rw-padX*2);
+      const scaleY=(c)=>ry+padY+(maxLat-c)/(maxLat-minLat||1)*(rh-padY*2);
+      ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=2.5;
+      ctx.lineCap='round';ctx.lineJoin='round';
+      ctx.beginPath();
+      coords.forEach((c,i)=>i===0?ctx.moveTo(scaleX(c[1]),scaleY(c[0])):ctx.lineTo(scaleX(c[1]),scaleY(c[0])));
+      ctx.stroke();
+      // Punto inicio (verde) y fin (naranja)
+      if(coords.length>1){
+        ctx.fillStyle='#4ade80';ctx.beginPath();ctx.arc(scaleX(coords[0][1]),scaleY(coords[0][0]),5,0,Math.PI*2);ctx.fill();
+        const last=coords[coords.length-1];
+        ctx.fillStyle='#f79d23';ctx.beginPath();ctx.arc(scaleX(last[1]),scaleY(last[0]),5,0,Math.PI*2);ctx.fill();
+      }
+    }
+
+    // ── Stats box ──
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();rRect(ctx,18,W*.38,W-36,H-W*.38-18,14);ctx.fill();
+    const stats=[
+      {ico:'⏱',val:rec.duration,lbl:'TIEMPO'},
+      {ico:'⚡',val:(rec.avgSpeed||'--')+' km/h',lbl:'PROMEDIO'},
+      {ico:'💨',val:(rec.maxSpeed||'--')+' km/h',lbl:'MÁXIMA'},
+      {ico:'🔥',val:(rec.cal||0)+' kcal',lbl:'CALORÍAS'}
+    ];
+    stats.forEach((s,i)=>{
+      const x=18+(i*(W-36)/4)+10,y=W*.38+8;
+      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='14px sans-serif';ctx.textBaseline='top';ctx.fillText(s.ico,x,y+2);
+      ctx.fillStyle='#fff';ctx.font='bold 15px DM Sans,sans-serif';ctx.fillText(s.val,x,y+22);
+      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px DM Sans,sans-serif';ctx.fillText(s.lbl,x,y+40);
+    });
+
+    // ── Footer ──
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='right';
+    ctx.fillText('pedalear.github.io/pedale.ar',W-22,H-14);
+  };
+  if(logoImg.complete)drawRest();else logoImg.onload=drawRest;
 }
 function rRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 
@@ -1273,6 +1535,7 @@ function rRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r
 // ════════════════════════════════
 function renderHistory(){
   renderSummaries();
+  renderLeaderboard();
   const list=document.getElementById('histList'),empty=document.getElementById('emptyHist');
   const fl=document.getElementById('friendsList');
   // Friends
@@ -1307,6 +1570,7 @@ function renderHistory(){
         <button class="hcard-btn blue" onclick='showRouteOnMap(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>🗺️ Ver ruta</button>
         <button class="hcard-btn blue" onclick='showHistoryGraph(${JSON.stringify({dist:r.dist,duration:r.duration,avgSpeed:r.avgSpeed,maxSpeed:r.maxSpeed,speedLog:r.speedLog||[]}).replace(/'/g,"&#39;")})'>📈 Gráfico</button>
         <button class="hcard-btn" onclick='exportRoute(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>👥 Compartir</button>
+        <button class="hcard-btn" onclick='startReplay(${JSON.stringify({coords:r.coords||[],dist:r.dist,duration:r.duration}).replace(/'/g,"&#39;")})'>▶ Replay</button>
         <button class="hcard-btn" onclick='followRoute(${JSON.stringify({coords:r.coords||[]}).replace(/'/g,"&#39;")})'>🔁 Seguir</button>
         <button class="hcard-btn red" onclick='deleteActivity(${r.id})'>🗑️</button>
       </div>`;
@@ -1318,7 +1582,7 @@ function renderHistory(){
 // MODALS / TABS / MODE
 // ════════════════════════════════
 function openSettings(){
-  renderAlertList();initNotifUI();loadProfile();
+  renderAlertList();initNotifUI();loadProfile();initUnits();initSpeedAlert();initIntervalCfg();initAutoPause();initAlwaysOn();
   const t=localStorage.getItem('pedaleTheme')||'auto';['auto','light','dark'].forEach(k=>{document.getElementById('theme'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.toggle('active',k===t);});
   const saved=localStorage.getItem('tomtomKey')||'';document.getElementById('tomtomKey').value=saved;
   openModal('settingsModal');
@@ -1339,7 +1603,7 @@ function showTab(id){
   const idx=['map','stats','logros','history'].indexOf(id);
   if(idx>=0)document.querySelectorAll('.tab')[idx].classList.add('active');
   if(id==='map')setTimeout(()=>map&&map.invalidateSize(),50);
-  if(id==='stats')setTimeout(()=>drawSpeedGraph(speedLog,maxSpeed),50);
+  if(id==='stats'){setTimeout(()=>drawSpeedGraph(speedLog,maxSpeed),50);renderTotalStats();}
   if(id==='logros')renderLogros();
 }
 
@@ -1637,13 +1901,412 @@ function hideSplash(){
 window.addEventListener('load',()=>setTimeout(hideSplash,2200));
 
 // ════════════════════════════════
+// TOTAL STATS
+// ════════════════════════════════
+function renderTotalStats(){
+  if(!historyData.length) return;
+  const totalKm = historyData.reduce((s,r)=>s+parseFloat(r.dist||0),0);
+  const totalRides = historyData.length;
+  const totalSecs = historyData.reduce((s,r)=>{
+    const [h,m,sec]=(r.duration||'0:0:0').split(':').map(Number);
+    return s + h*3600 + m*60 + sec;
+  },0);
+  const totalCal = historyData.reduce((s,r)=>s+(r.cal||0),0);
+  const maxSpeed = Math.max(...historyData.map(r=>parseFloat(r.maxSpeed||0)));
+  const maxDist  = Math.max(...historyData.map(r=>parseFloat(r.dist||0)));
+  const streak   = computeStreak(historyData);
+  const totalH   = Math.floor(totalSecs/3600);
+  const u = getUnitLabel();
+
+  const conv = (km) => unitSystem()==='imperial' ? (km*0.621371).toFixed(1) : km.toFixed(1);
+  const convS = (kmh) => unitSystem()==='imperial' ? (kmh*0.621371).toFixed(1) : kmh.toFixed(1);
+
+  document.getElementById('tsKm').textContent    = conv(totalKm);
+  document.getElementById('tsRides').textContent  = totalRides;
+  document.getElementById('tsTime').textContent   = totalH+'h';
+  document.getElementById('tsCal').textContent    = totalCal.toLocaleString('es-AR');
+  document.getElementById('recMaxSpeed').textContent = convS(maxSpeed)+' '+u.speed;
+  document.getElementById('recMaxDist').textContent  = conv(maxDist)+' '+u.dist;
+  document.getElementById('recStreak').textContent   = streak+' días';
+}
+
+// ════════════════════════════════
+// UNIDADES
+// ════════════════════════════════
+function unitSystem(){ return localStorage.getItem('pedaleUnits')||'metric'; }
+function getUnitLabel(){ return unitSystem()==='imperial'?{speed:'mph',dist:'mi',pace:'min/mi'}:{speed:'km/h',dist:'km',pace:'min/km'}; }
+function setUnits(sys){
+  localStorage.setItem('pedaleUnits',sys);
+  document.getElementById('unitKm')?.classList.toggle('active',sys==='metric');
+  document.getElementById('unitMi')?.classList.toggle('active',sys==='imperial');
+  showToast(sys==='metric'?'📏 Kilómetros activados':'📏 Millas activadas');
+  renderTotalStats();
+  updateStatsDisplay();
+}
+function initUnits(){
+  const sys=unitSystem();
+  document.getElementById('unitKm')?.classList.toggle('active',sys==='metric');
+  document.getElementById('unitMi')?.classList.toggle('active',sys==='imperial');
+}
+function convertSpeed(kmh){ return unitSystem()==='imperial'?kmh*0.621371:kmh; }
+function convertDist(km){   return unitSystem()==='imperial'?km*0.621371:km; }
+function updateStatsDisplay(){
+  const u=getUnitLabel();
+  // Update labels in stats tab
+  document.querySelectorAll('.sc-unit').forEach((el,i)=>{
+    if(el.textContent.includes('km/h')||el.textContent.includes('mph')) el.textContent=el.textContent.replace(/km\/h|mph/,u.speed);
+    if(el.textContent==='kilómetros') el.textContent=unitSystem()==='imperial'?'millas':'kilómetros';
+  });
+}
+
+// ════════════════════════════════
+// AVISO DE VELOCIDAD MÍNIMA
+// ════════════════════════════════
+let _speedAlertFired = false, _speedAlertTimer = null;
+function saveSpeedAlert(){
+  const on = document.getElementById('speedAlertToggle').checked;
+  localStorage.setItem('speedAlertOn', on?'1':'0');
+  const wrap = document.getElementById('speedAlertRow');
+  if(wrap) wrap.style.display = on?'block':'none';
+}
+function updateSpeedAlert(val){
+  localStorage.setItem('speedAlertMin', val);
+  document.getElementById('speedAlertVal').textContent = val+' km/h';
+  const pct = ((val-5)/(50-5)*100).toFixed(1);
+  document.getElementById('speedAlertSlider').style.setProperty('--pct', pct+'%');
+}
+function initSpeedAlert(){
+  const on = localStorage.getItem('speedAlertOn')==='1';
+  const val = localStorage.getItem('speedAlertMin')||'15';
+  if(document.getElementById('speedAlertToggle')) document.getElementById('speedAlertToggle').checked=on;
+  const wrap = document.getElementById('speedAlertRow');
+  if(wrap) wrap.style.display = on?'block':'none';
+  updateSpeedAlert(val);
+  if(document.getElementById('speedAlertSlider')) document.getElementById('speedAlertSlider').value=val;
+}
+function checkSpeedAlert(kmh){
+  if(localStorage.getItem('speedAlertOn')!=='1') return;
+  const min = parseFloat(localStorage.getItem('speedAlertMin')||15);
+  if(kmh < min && kmh > 0){
+    if(!_speedAlertTimer){
+      _speedAlertTimer = setTimeout(()=>{
+        if(isRecording && !isPaused){
+          showToast(`⚠️ Velocidad baja: ${kmh.toFixed(1)} km/h`);
+          if(document.getElementById('soundToggle')?.checked) playBeep();
+        }
+        _speedAlertTimer=null;
+      }, 8000); // espera 8 segundos antes de avisar
+    }
+  } else {
+    clearTimeout(_speedAlertTimer);
+    _speedAlertTimer=null;
+  }
+}
+
+// ════════════════════════════════
+// EXPORTAR HISTORIAL
+// ════════════════════════════════
+function exportHistory(format){
+  if(!historyData.length){showToast('⚠️ No hay actividades para exportar');return;}
+  if(format==='csv'){
+    const headers=['Fecha','Hora','Modo','Distancia','Duración','Vel.Promedio','Vel.Máxima','Calorías','Clima'];
+    const rows = historyData.map(r=>[
+      r.date,r.time,r.mode==='bike'?'Bici':'Carrera',
+      r.dist,r.duration,r.avgSpeed,r.maxSpeed,r.cal,
+      (r.weather||'').replace(/,/g,';')
+    ]);
+    const csv = [headers,...rows].map(r=>r.join(',')).join('\n');
+    downloadText(csv,'pedalear-historial.csv','text/csv');
+    showToast('📄 CSV descargado');
+  } else {
+    const clean = historyData.map(({coords,speedLog,...r})=>r); // sin coords/speedLog para que no sea enorme
+    downloadText(JSON.stringify(clean,null,2),'pedalear-historial.json','application/json');
+    showToast('📦 JSON descargado');
+  }
+}
+function downloadText(content, filename, mime){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=filename; a.click();
+}
+
+// ════════════════════════════════
+// URL COMPARTIBLE
+// ════════════════════════════════
+function generateShareUrl(rec){
+  if(!rec) return '';
+  const data={d:rec.dist,dur:rec.duration,m:rec.mode,avg:rec.avgSpeed,max:rec.maxSpeed,cal:rec.cal,dt:rec.date};
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  return `https://pedalear.github.io/pedale.ar/?share=${encoded}`;
+}
+function copyShareUrl(){
+  const url = document.getElementById('shareUrlInp')?.value;
+  if(!url) return;
+  navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiado!'));
+}
+
+// ════════════════════════════════
+// 1. SHARED ACTIVITY LINK HANDLER
+// ════════════════════════════════
+function handleShareLink(){
+  const params=new URLSearchParams(window.location.search);
+  const data=params.get('share');
+  if(!data)return;
+  try{
+    const rec=JSON.parse(decodeURIComponent(escape(atob(data))));
+    const content=document.getElementById('sharedContent');
+    if(content){
+      content.innerHTML=`
+        <div class="shared-act-card">
+          <div class="shared-act-mode">${rec.m==='bike'?'🚴 En Bici':'🏃 A Pata'} · ${rec.dt||''}</div>
+          <div class="shared-act-dist">${rec.d}</div>
+          <div style="font-size:14px;opacity:.8;margin-top:2px">kilómetros</div>
+          <div class="shared-act-stats">
+            <div class="shared-act-stat"><div class="shared-act-val">${rec.dur||'--'}</div><div class="shared-act-lbl">Tiempo</div></div>
+            <div class="shared-act-stat"><div class="shared-act-val">${rec.avg||'--'}</div><div class="shared-act-lbl">km/h prom</div></div>
+            <div class="shared-act-stat"><div class="shared-act-val">${rec.cal||'--'}</div><div class="shared-act-lbl">kcal</div></div>
+          </div>
+        </div>`;
+    }
+    document.getElementById('sharedModal').classList.add('open');
+  }catch(e){}
+}
+
+// ════════════════════════════════
+// 2. WEATHER FORECAST
+// ════════════════════════════════
+async function openForecast(){
+  if(!currentPos){showToast('⚠️ GPS no disponible');return;}
+  openModal('forecastModal');
+  document.getElementById('forecastRow').innerHTML='<div style="padding:20px;color:var(--muted);font-size:13px">Cargando pronóstico…</div>';
+  try{
+    const{lat,lng}=currentPos;
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&hourly=weather_code,temperature_2m,precipitation_probability&forecast_days=1&timezone=auto`);
+    const d=await r.json();
+    const now=new Date();
+    const currentHour=now.getHours();
+    const hours=d.hourly.time.map((t,i)=>({
+      hour:new Date(t).getHours(),
+      code:d.hourly.weather_code[i],
+      temp:Math.round(d.hourly.temperature_2m[i]),
+      rain:d.hourly.precipitation_probability[i]
+    })).filter(h=>h.hour>=currentHour).slice(0,8);
+    const WMO_ICON={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'❄️',75:'❄️',80:'🌧️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+    document.getElementById('forecastTitle').textContent=`🌤️ Próximas horas · ${WMO_ICON[hours[0]?.code]||'🌡️'} ${hours[0]?.temp||'--'}°C ahora`;
+    document.getElementById('forecastRow').innerHTML=hours.map(h=>`
+      <div class="forecast-card">
+        <div class="forecast-hour">${h.hour}:00</div>
+        <div class="forecast-icon">${WMO_ICON[h.code]||'🌡️'}</div>
+        <div class="forecast-temp">${h.temp}°</div>
+        <div class="forecast-rain">${h.rain}%💧</div>
+      </div>`).join('');
+  }catch(e){document.getElementById('forecastRow').innerHTML='<div style="padding:20px;color:var(--muted);font-size:13px">⚠️ No se pudo cargar el pronóstico</div>';}
+}
+
+// ════════════════════════════════
+// 3. INTERVAL TRAINING
+// ════════════════════════════════
+let _intActive=false,_intPhase='fast',_intRep=0,_intTimer=null,_intRemaining=0,_intInterval=null;
+const _intCfg={fast:2,slow:1,reps:5};
+
+function saveIntervalCfg(){
+  const on=document.getElementById('intervalToggle').checked;
+  localStorage.setItem('intervalOn',on?'1':'0');
+  localStorage.setItem('intervalCfg',JSON.stringify(_intCfg));
+  document.getElementById('intervalCfg').style.display=on?'block':'none';
+}
+function adjInterval(key,delta){
+  _intCfg[key]=Math.max(1,(_intCfg[key]||1)+delta);
+  document.getElementById('int'+key.charAt(0).toUpperCase()+key.slice(1)+'Val').textContent=_intCfg[key];
+  localStorage.setItem('intervalCfg',JSON.stringify(_intCfg));
+}
+function initIntervalCfg(){
+  const on=localStorage.getItem('intervalOn')==='1';
+  const cfg=JSON.parse(localStorage.getItem('intervalCfg')||'{}');
+  if(cfg.fast)_intCfg.fast=cfg.fast;
+  if(cfg.slow)_intCfg.slow=cfg.slow;
+  if(cfg.reps)_intCfg.reps=cfg.reps;
+  if(document.getElementById('intervalToggle'))document.getElementById('intervalToggle').checked=on;
+  if(document.getElementById('intFastVal'))document.getElementById('intFastVal').textContent=_intCfg.fast;
+  if(document.getElementById('intSlowVal'))document.getElementById('intSlowVal').textContent=_intCfg.slow;
+  if(document.getElementById('intRepsVal'))document.getElementById('intRepsVal').textContent=_intCfg.reps;
+  if(document.getElementById('intervalCfg'))document.getElementById('intervalCfg').style.display=on?'block':'none';
+}
+function startIntervals(){
+  if(localStorage.getItem('intervalOn')!=='1')return;
+  _intActive=true;_intRep=0;_intPhase='fast';
+  document.getElementById('intervalIndicator').classList.add('show');
+  triggerNextInterval();
+}
+function triggerNextInterval(){
+  if(!_intActive||!isRecording)return;
+  const totalPhases=_intCfg.reps*2;
+  if(_intRep>=totalPhases){
+    _intActive=false;
+    document.getElementById('intervalIndicator').classList.remove('show');
+    showToast('🏁 ¡Entrenamiento por intervalos completado!');
+    playBeep();return;
+  }
+  _intPhase=_intRep%2===0?'fast':'slow';
+  _intRemaining=(_intPhase==='fast'?_intCfg.fast:_intCfg.slow)*60;
+  _intRep++;
+  playBeep();
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  showToast(_intPhase==='fast'?'🔥 ¡RÁPIDO!':'💨 Recupero');
+  const label=document.getElementById('intPhaseLabel');
+  if(label){label.textContent=_intPhase==='fast'?'🔥 RÁPIDO':'💨 RECUPERO';label.className='int-phase '+_intPhase;}
+  clearInterval(_intInterval);
+  _intInterval=setInterval(()=>{
+    _intRemaining--;
+    const m=Math.floor(_intRemaining/60),s=_intRemaining%60;
+    const cd=document.getElementById('intCountdown');
+    if(cd)cd.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    if(_intRemaining<=0){clearInterval(_intInterval);triggerNextInterval();}
+  },1000);
+}
+function stopIntervals(){
+  _intActive=false;clearInterval(_intInterval);
+  document.getElementById('intervalIndicator').classList.remove('show');
+}
+
+// ════════════════════════════════
+// 4. AUTO-PAUSA
+// ════════════════════════════════
+let _autoPauseTimer=null,_wasAutoPaused=false;
+function checkAutoPause(kmh){
+  if(localStorage.getItem('autoPauseOn')!=='1')return;
+  if(isPaused&&!_wasAutoPaused)return;
+  if(kmh<1.0&&!isPaused){
+    if(!_autoPauseTimer){
+      _autoPauseTimer=setTimeout(()=>{
+        if(!isPaused&&isRecording){
+          _wasAutoPaused=true;
+          pauseActivity();
+          showToast('⏸ Auto-pausado — sin movimiento');
+        }
+        _autoPauseTimer=null;
+      },10000);
+    }
+  }else if(kmh>=1.0){
+    clearTimeout(_autoPauseTimer);_autoPauseTimer=null;
+    if(isPaused&&_wasAutoPaused){
+      _wasAutoPaused=false;
+      pauseActivity();
+      showToast('▶ Auto-reanudado');
+    }
+  }
+}
+function initAutoPause(){
+  const on=localStorage.getItem('autoPauseOn')==='1';
+  if(document.getElementById('autoPauseToggle'))document.getElementById('autoPauseToggle').checked=on;
+}
+
+// ════════════════════════════════
+// 5. PANTALLA SIEMPRE ENCENDIDA
+// ════════════════════════════════
+let _alwaysOnLock=null;
+async function setAlwaysOn(on){
+  localStorage.setItem('alwaysOn',on?'1':'0');
+  if(on){
+    if('wakeLock' in navigator){
+      try{_alwaysOnLock=await navigator.wakeLock.request('screen');showToast('📱 Pantalla siempre encendida');}catch(e){}
+    }
+  }else{
+    if(_alwaysOnLock){_alwaysOnLock.release();_alwaysOnLock=null;}
+    showToast('📱 Pantalla normal');
+  }
+}
+function initAlwaysOn(){
+  const on=localStorage.getItem('alwaysOn')==='1';
+  if(document.getElementById('alwaysOnToggle'))document.getElementById('alwaysOnToggle').checked=on;
+  if(on)setAlwaysOn(true);
+}
+
+// ════════════════════════════════
+// 6. ROUTE REPLAY
+// ════════════════════════════════
+let _replayActive=false,_replayMarker=null,_replayTimeout=null,_replayIdx=0,_replayCoords=[];
+function startReplay(rec){
+  const coords=rec.coords||[];
+  if(coords.length<2){showToast('⚠️ Sin ruta para este recorrido');return;}
+  showTab('map');
+  stopReplay();
+  if(window._replayLayer)map.removeLayer(window._replayLayer);
+  window._replayLayer=L.polyline(coords,{color:'#592452',weight:3,opacity:.4,dashArray:'6,4'}).addTo(map);
+  map.fitBounds(window._replayLayer.getBounds(),{padding:[40,80]});
+  const icon=L.divIcon({html:'<div style="width:14px;height:14px;background:#ea580c;border-radius:50%;border:3px solid #fff;box-shadow:0 0 10px rgba(234,88,12,.6)"></div>',iconSize:[14,14],iconAnchor:[7,7],className:''});
+  _replayMarker=L.marker(coords[0],{icon}).addTo(map);
+  _replayActive=true;_replayIdx=0;_replayCoords=coords;
+  document.getElementById('replayControls').classList.add('show');
+  animateReplay();
+  showToast(`▶ Reproduciendo · ${rec.dist} km`);
+}
+function animateReplay(){
+  if(!_replayActive||_replayIdx>=_replayCoords.length){
+    document.getElementById('replayControls').classList.remove('show');
+    if(_replayMarker){map.removeLayer(_replayMarker);_replayMarker=null;}
+    _replayActive=false;
+    if(_replayIdx>=_replayCoords.length)showToast('🏁 Replay completado');
+    return;
+  }
+  const pct=Math.round(_replayIdx/_replayCoords.length*100);
+  const prog=document.getElementById('replayProgress');
+  if(prog)prog.textContent=`▶ ${pct}%`;
+  _replayMarker.setLatLng(_replayCoords[_replayIdx]);
+  map.panTo(_replayCoords[_replayIdx],{animate:false});
+  _replayIdx++;
+  const delay=Math.max(25,Math.floor(4000/_replayCoords.length));
+  _replayTimeout=setTimeout(animateReplay,delay);
+}
+function stopReplay(){
+  _replayActive=false;
+  clearTimeout(_replayTimeout);
+  if(_replayMarker){map.removeLayer(_replayMarker);_replayMarker=null;}
+  document.getElementById('replayControls').classList.remove('show');
+}
+
+// ════════════════════════════════
+// 7. LEADERBOARD SEMANAL
+// ════════════════════════════════
+function renderLeaderboard(){
+  const lb=document.getElementById('leaderboard');
+  if(!lb)return;
+  const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(now.getDate()-6);weekAgo.setHours(0,0,0,0);
+  const parseAR=s=>{const[d,m,y]=s.split('/');return new Date(y,m-1,d);};
+  const myKm=historyData.filter(r=>parseAR(r.date)>=weekAgo).reduce((s,r)=>s+parseFloat(r.dist||0),0);
+  const friendsWeek=friendsData.map(f=>({
+    name:f.n||'Amigo',
+    km:parseFloat(f.d||0)
+  }));
+  const all=[{name:'Vos 🏅',km:myKm},...friendsWeek].sort((a,b)=>b.km-a.km);
+  if(all.length<2){lb.innerHTML='';return;}
+  const medals=['first','second','third'];
+  lb.innerHTML=`<div class="lb-card">
+    <div class="lb-title">🏆 Ranking semanal</div>
+    ${all.map((p,i)=>`<div class="lb-row">
+      <div class="lb-pos ${medals[i]||''}">${i+1}</div>
+      <div class="lb-name">${p.name}</div>
+      <div class="lb-km">${p.km.toFixed(1)} km</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ════════════════════════════════
 // BOOT
 // ════════════════════════════════
 renderHistory();
 renderLogros();
 loadProfile();
 initTheme();
+initUnits();
+initSpeedAlert();
+initIntervalCfg();
+initAutoPause();
+initAlwaysOn();
 initMap();
+renderTotalStats();
+handleShareLink();
 createPWAManifest();
 updateOnlineStatus();
 registerSW();
