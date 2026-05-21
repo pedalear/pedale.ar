@@ -791,17 +791,37 @@ function tryGPS(){
   showGpsTag('Buscando señal GPS…');
   navigator.geolocation.getCurrentPosition(pos=>{
     const{latitude:lat,longitude:lng,accuracy,altitude}=pos.coords;
-    currentPos={lat,lng};map.setView([lat,lng],16);placeMarker(lat,lng,accuracy);
+    currentPos={lat,lng};map.setView([lat,lng],16);placeMarker(lat,lng,accuracy,null);
     if(altitude!=null)currentAlt=Math.round(altitude);
     hideGpsTag();fetchWeather(lat,lng);
   },()=>showGpsTag('Activá el GPS del dispositivo'),{enableHighAccuracy:true,timeout:12000});
 }
-function placeMarker(lat,lng,acc){
-  const icon=L.divIcon({html:`<div style="width:14px;height:14px;background:#ea580c;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(234,88,12,.25)"></div>`,iconSize:[14,14],iconAnchor:[7,7],className:''});
-  if(userMarker)userMarker.setLatLng([lat,lng]);
-  else userMarker=L.marker([lat,lng],{icon}).addTo(map);
-  if(accCircle)accCircle.setLatLng([lat,lng]).setRadius(acc||8);
-  else accCircle=L.circle([lat,lng],{radius:acc||8,color:'rgba(234,88,12,.3)',fillColor:'rgba(234,88,12,.07)',fillOpacity:1,weight:1}).addTo(map);
+let _lastHeading = 0;
+
+function placeMarker(lat, lng, acc, heading){
+  // Heading: 0=Norte, 90=Este, etc. NaN = quieto
+  const h = (heading != null && !isNaN(heading)) ? heading : _lastHeading;
+  if (!isNaN(h) && heading != null) _lastHeading = h;
+
+  const isMoving = heading != null && !isNaN(heading);
+
+  // Marcador: flecha cuando se mueve, círculo cuando está quieto
+  const markerHTML = isMoving
+    ? `<svg width="24" height="24" viewBox="0 0 24 24" style="transform:rotate(${h}deg);transform-origin:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))">
+        <polygon points="12,2 20,21 12,17 4,21" fill="#ea580c" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+       </svg>`
+    : `<div style="width:14px;height:14px;background:#ea580c;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(234,88,12,.25)"></div>`;
+
+  const size  = isMoving ? [24,24] : [14,14];
+  const anchor = isMoving ? [12,12] : [7,7];
+
+  const icon = L.divIcon({html:markerHTML, iconSize:size, iconAnchor:anchor, className:''});
+
+  if(userMarker){ userMarker.setLatLng([lat,lng]); userMarker.setIcon(icon); }
+  else userMarker = L.marker([lat,lng],{icon}).addTo(map);
+
+  if(accCircle) accCircle.setLatLng([lat,lng]).setRadius(acc||8);
+  else accCircle = L.circle([lat,lng],{radius:acc||8,color:'rgba(234,88,12,.3)',fillColor:'rgba(234,88,12,.07)',fillOpacity:1,weight:1}).addTo(map);
 }
 
 // ════════════════════════════════
@@ -884,7 +904,10 @@ function onPos(pos){
   const{latitude:lat,longitude:lng,speed,accuracy,altitude}=pos.coords;
   const kmh=speed!=null?speed*3.6:0;
   if(altitude!=null)currentAlt=Math.round(altitude);
-  currentPos={lat,lng};placeMarker(lat,lng,accuracy);map.panTo([lat,lng],{animate:true,duration:.4});
+  currentPos={lat,lng};
+  placeMarker(lat,lng,accuracy,pos.coords.heading);
+  // Centrar teniendo en cuenta la bottom sheet
+  panToUser(lat,lng);
   if(isRecording&&!isPaused){
     if(lastPos)totalDist+=haversine(lastPos[0],lastPos[1],lat,lng);
     lastPos=[lat,lng];routeCoords.push([lat,lng]);routeLine.setLatLngs(routeCoords);
@@ -1465,6 +1488,26 @@ function initTheme(){
     .addEventListener('change', ()=>{
       if((localStorage.getItem('pedaleTheme')||'auto')==='auto') applyTheme('auto');
     });
+}
+
+
+// ════════════════════════════════
+// PAN CENTRADO — compensa bottom sheet
+// ════════════════════════════════
+function panToUser(lat, lng){
+  // Desplazar el centro hacia arriba para que el marcador
+  // quede visible encima de la bottom sheet
+  const sheet = document.querySelector('.bottom-sheet');
+  const sheetH = sheet ? sheet.offsetHeight : 140;
+  const mapH   = map.getSize().y;
+  const offset  = sheetH / 2; // pixels a subir
+
+  // Convertir el punto del usuario a píxeles, subir el offset, reconvertir a LatLng
+  const userPx = map.latLngToContainerPoint([lat, lng]);
+  const targetPx = L.point(userPx.x, userPx.y + offset);
+  const targetLL = map.containerPointToLatLng(targetPx);
+
+  map.panTo(targetLL, {animate:true, duration:.4});
 }
 
 // ════════════════════════════════
