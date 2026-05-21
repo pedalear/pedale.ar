@@ -290,6 +290,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .credits-title{font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px}
 .credits-ver{display:inline-block;background:var(--accent-light);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle}
 
+
+/* Street name */
+.street-name{font-size:11px;color:var(--soft);text-align:center;margin-top:-4px;font-weight:500;min-height:14px;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Summary cards */
+.summary-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.sum-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+.sum-period{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px}
+.sum-km{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--accent);line-height:1}
+.sum-unit{font-size:10px;color:var(--muted)}
+.sum-sub{font-size:11px;color:var(--soft);margin-top:4px}
+
+/* Profile section */
+.profile-inp{width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:14px;padding:0 14px;outline:none;color:var(--text);margin-top:6px}
+.profile-inp:focus{border-color:var(--accent)}
+.profile-row{display:flex;gap:8px;margin-top:6px}
+.profile-inp.half{flex:1}
+.weight-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+.weight-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);min-width:50px}
+
+/* Follow route indicator */
+.follow-badge{display:none;align-items:center;gap:6px;background:rgba(89,36,82,.9);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;position:absolute;top:54px;left:50%;transform:translateX(-50%);z-index:25;white-space:nowrap;box-shadow:var(--shadow)}
+.follow-badge.show{display:flex}
+.follow-dot{width:6px;height:6px;border-radius:50%;background:#f79d23;animation:blink 1s infinite}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px}
 </style>
@@ -327,6 +351,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div><div class="wb-temp" id="wbTemp">--°C</div><div class="wb-desc" id="wbDesc">cargando…</div></div>
   </div>
   <div class="offline-badge" id="offlineBadge">📵 Sin conexión · mapa en caché</div>
+  <div class="follow-badge" id="followBadge"><div class="follow-dot"></div>Siguiendo ruta</div>
   <div class="gps-tag" id="gpsTag"><div class="gps-pulse"></div><span id="gpsTagText">Buscando GPS…</span></div>
   <button class="traffic-btn" id="trafficBtn" onclick="toggleTraffic()">🚦</button>
   <div class="traffic-legend" id="trafficLegend">
@@ -347,6 +372,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
         <div class="live-metric"><div class="lm-val big" id="lmSpeed">0.0</div><div class="lm-lbl">km/h</div></div>
         <div class="live-metric"><div class="lm-val" id="lmDist">0.00</div><div class="lm-lbl">km</div></div>
       </div>
+      <div class="street-name" id="streetName"></div>
       <div class="active-controls">
         <div class="rec-dot on" id="recDot"></div>
         <div class="wl-dot" id="wlDot"></div>
@@ -406,6 +432,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   </div>
   <div id="friendsList" style="display:flex;flex-direction:column;gap:8px;margin-top:2px"></div>
   <div class="sec-title" style="margin-top:8px">📋 Mis actividades</div>
+  <div class="summary-row" id="summaryRow" style="display:none"></div>
   <div id="histList" style="display:flex;flex-direction:column;gap:10px;flex:1"></div>
   <div class="empty-state" id="emptyHist"><div class="ei">🚴</div><p>Todavía no hay actividades. ¡Salí a pedalear!</p></div>
 </div>
@@ -415,6 +442,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">⚙️ Configuración</div>
+
+    <div class="sec-div">👤 Tu perfil</div>
+    <input class="profile-inp" id="profName" type="text" placeholder="Tu nombre" oninput="saveProfile()">
+    <input class="profile-inp" id="profCity" type="text" placeholder="Tu ciudad" oninput="saveProfile()" style="margin-top:6px">
+    <div class="weight-row">
+      <div class="cfg-desc">Peso (para calorías)<small>Afecta el cálculo de kcal</small></div>
+      <div class="weight-val" id="weightVal">70 kg</div>
+    </div>
+    <input type="range" min="40" max="150" value="70" id="profWeight"
+      oninput="document.getElementById('weightVal').textContent=this.value+' kg';saveProfile()"
+      style="width:100%;margin-top:4px">
     <div class="sec-div">🚦 Tránsito en tiempo real</div>
     <div style="font-size:12px;color:var(--soft);line-height:1.6;margin-bottom:6px">Usamos TomTom Traffic. Creá tu cuenta gratis en <a class="key-link" href="https://developer.tomtom.com" target="_blank">developer.tomtom.com</a></div>
     <div class="add-row">
@@ -746,6 +784,7 @@ function stopActivity(){
 }
 function resetUI(){
   isRecording=false;
+  const sn=document.getElementById('streetName');if(sn)sn.textContent='';
   document.getElementById('idleView').style.display='flex';
   document.getElementById('activeView').style.display='none';
   document.getElementById('recDot').className='rec-dot';
@@ -768,6 +807,7 @@ function onPos(pos){
     const t=Math.floor(getElapsed());
     if(!speedLog.length||t-speedLog[speedLog.length-1].t>=5) speedLog.push({t,v:parseFloat(kmh.toFixed(1))});
     updateStats(kmh);checkDistanceAlerts(totalDist);hideGpsTag();
+    reverseGeocode(lat,lng);
   }
 }
 function updateStats(kmh){
@@ -797,7 +837,7 @@ function startTimer(){
 function getElapsed(){return startTime?(Date.now()-startTime-pausedTime)/1000:0;}
 function formatTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60);return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function haversine(la1,lo1,la2,lo2){const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-function estimateCal(km,secs){return Math.round((activityMode==='bike'?8:9.8)*70*(secs/3600));}
+function estimateCal(km,secs){return Math.round((activityMode==='bike'?8:9.8)*getUserWeight()*(secs/3600));}
 function downsample(arr,max){if(!arr||arr.length<=max)return arr||[];const step=Math.ceil(arr.length/max);return arr.filter((_,i)=>i%step===0);}
 function downsampleLog(log,max){if(!log||log.length<=max)return log||[];const step=Math.ceil(log.length/max);return log.filter((_,i)=>i%step===0);}
 
@@ -1123,6 +1163,7 @@ function rRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r
 // HISTORY
 // ════════════════════════════════
 function renderHistory(){
+  renderSummaries();
   const list=document.getElementById('histList'),empty=document.getElementById('emptyHist');
   const fl=document.getElementById('friendsList');
   // Friends
@@ -1157,6 +1198,7 @@ function renderHistory(){
         <button class="hcard-btn blue" onclick='showRouteOnMap(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>🗺️ Ver ruta</button>
         <button class="hcard-btn blue" onclick='showHistoryGraph(${JSON.stringify({dist:r.dist,duration:r.duration,avgSpeed:r.avgSpeed,maxSpeed:r.maxSpeed,speedLog:r.speedLog||[]}).replace(/'/g,"&#39;")})'>📈 Gráfico</button>
         <button class="hcard-btn" onclick='exportRoute(${JSON.stringify({...r,speedLog:undefined}).replace(/'/g,"&#39;")})'>👥 Compartir</button>
+        <button class="hcard-btn" onclick='followRoute(${JSON.stringify({coords:r.coords||[]}).replace(/'/g,"&#39;")})'>🔁 Seguir</button>
         <button class="hcard-btn red" onclick='deleteActivity(${r.id})'>🗑️</button>
       </div>`;
     list.appendChild(c);
@@ -1167,7 +1209,7 @@ function renderHistory(){
 // MODALS / TABS / MODE
 // ════════════════════════════════
 function openSettings(){
-  renderAlertList();initNotifUI();
+  renderAlertList();initNotifUI();loadProfile();
   const saved=localStorage.getItem('tomtomKey')||'';document.getElementById('tomtomKey').value=saved;
   openModal('settingsModal');
 }
@@ -1285,11 +1327,121 @@ function createPWAManifest(){
   document.getElementById('pwaManifest').href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(manifest));
 }
 
+
+// ════════════════════════════════
+// PERFIL DE USUARIO
+// ════════════════════════════════
+function saveProfile(){
+  const p={
+    name: document.getElementById('profName')?.value||'',
+    city: document.getElementById('profCity')?.value||'',
+    weight: parseInt(document.getElementById('profWeight')?.value||70)
+  };
+  localStorage.setItem('pedaleProfile',JSON.stringify(p));
+}
+function loadProfile(){
+  const p=JSON.parse(localStorage.getItem('pedaleProfile')||'{}');
+  if(document.getElementById('profName')) document.getElementById('profName').value=p.name||'';
+  if(document.getElementById('profCity')) document.getElementById('profCity').value=p.city||'';
+  if(document.getElementById('profWeight')){
+    document.getElementById('profWeight').value=p.weight||70;
+    document.getElementById('weightVal').textContent=(p.weight||70)+' kg';
+  }
+}
+function getUserWeight(){ return parseInt(JSON.parse(localStorage.getItem('pedaleProfile')||'{}').weight||70); }
+
+// ════════════════════════════════
+// REVERSE GEOCODING — nombre de calle
+// ════════════════════════════════
+let _lastGeocode=0, _lastStreet='';
+async function reverseGeocode(lat,lng){
+  const now=Date.now();
+  if(now-_lastGeocode<15000)return; // máx 1 request cada 15s
+  _lastGeocode=now;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat.toFixed(5)}&lon=${lng.toFixed(5)}&format=json`,
+      {headers:{'Accept-Language':'es'}});
+    const d=await r.json();
+    const road=d.address?.road||d.address?.pedestrian||d.address?.path||d.address?.cycleway||'';
+    const area=d.address?.suburb||d.address?.neighbourhood||d.address?.village||d.address?.city_district||'';
+    const loc=[road,area].filter(Boolean).join(' · ');
+    if(loc&&loc!==_lastStreet){
+      _lastStreet=loc;
+      const el=document.getElementById('streetName');
+      if(el)el.textContent='📍 '+loc;
+    }
+  }catch(e){}
+}
+
+// ════════════════════════════════
+// RESUMEN SEMANAL / MENSUAL
+// ════════════════════════════════
+function renderSummaries(){
+  const row=document.getElementById('summaryRow');
+  if(!row||!historyData.length){if(row)row.style.display='none';return;}
+  const now=new Date();
+  const parseAR=s=>{const[d,m,y]=s.split('/');return new Date(y,m-1,d);};
+  const weekAgo=new Date(now);weekAgo.setDate(now.getDate()-6);weekAgo.setHours(0,0,0,0);
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const week=historyData.filter(r=>parseAR(r.date)>=weekAgo);
+  const month=historyData.filter(r=>parseAR(r.date)>=monthStart);
+  const sum=(arr)=>({
+    km:arr.reduce((s,r)=>s+parseFloat(r.dist||0),0).toFixed(1),
+    rides:arr.length,
+    cal:arr.reduce((s,r)=>s+(r.cal||0),0)
+  });
+  const w=sum(week),m=sum(month);
+  row.style.display='grid';
+  row.innerHTML=`
+    <div class="sum-card">
+      <div class="sum-period">📅 Esta semana</div>
+      <div class="sum-km">${w.km}</div>
+      <div class="sum-unit">km</div>
+      <div class="sum-sub">🚴 ${w.rides} salida${w.rides!==1?'s':''} · 🔥 ${w.cal} kcal</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-period">📆 Este mes</div>
+      <div class="sum-km">${m.km}</div>
+      <div class="sum-unit">km</div>
+      <div class="sum-sub">🚴 ${m.rides} salida${m.rides!==1?'s':''} · 🔥 ${m.cal} kcal</div>
+    </div>`;
+}
+
+// ════════════════════════════════
+// SEGUIR RUTA (FOLLOW ROUTE)
+// ════════════════════════════════
+let _followPolyline=null, _followCoords=[], _followActive=false;
+
+function followRoute(rec){
+  const coords=rec.coords||[];
+  if(coords.length<2){showToast('⚠️ Esta actividad no tiene ruta guardada');return;}
+  showTab('map');
+  // Limpiar ruta previa
+  if(_followPolyline){map.removeLayer(_followPolyline);_followPolyline=null;}
+  // Dibujar ruta guía en color sunset púrpura punteado
+  _followPolyline=L.polyline(coords,{
+    color:'#592452',weight:4,opacity:.7,
+    dashArray:'10,8',lineJoin:'round'
+  }).addTo(map);
+  _followCoords=coords;
+  _followActive=true;
+  map.fitBounds(_followPolyline.getBounds(),{padding:[40,80]});
+  document.getElementById('followBadge').classList.add('show');
+  showToast('🔁 Ruta cargada como guía · empezá a grabar');
+}
+
+function clearFollowRoute(){
+  if(_followPolyline){map.removeLayer(_followPolyline);_followPolyline=null;}
+  _followActive=false;_followCoords=[];
+  document.getElementById('followBadge').classList.remove('show');
+}
+
 // ════════════════════════════════
 // BOOT
 // ════════════════════════════════
 renderHistory();
 renderLogros();
+loadProfile();
 initMap();
 createPWAManifest();
 updateOnlineStatus();
