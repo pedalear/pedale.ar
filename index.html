@@ -75,6 +75,13 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 .gps-pulse{width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:blink 1s infinite}
 .offline-badge{position:absolute;top:54px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(220,38,38,.9);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;display:none;align-items:center;gap:6px;white-space:nowrap;box-shadow:var(--shadow)}
 .offline-badge.show{display:flex}
+
+/* Brújula */
+.compass-btn{position:absolute;right:10px;top:138px;z-index:20;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s}
+.compass-btn:active{transform:scale(.93)}
+.compass-btn.heading-up{background:var(--accent);border-color:var(--accent)}
+.compass-needle{transition:transform .3s ease}
+[data-theme="dark"] .compass-btn{background:rgba(26,31,46,.92);border-color:rgba(255,255,255,.12)}
 .traffic-btn{position:absolute;right:10px;top:95px;z-index:20;width:34px;height:34px;border-radius:8px;border:2px solid rgba(0,0,0,.15);background:var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s}
 .traffic-btn.on{background:var(--accent);border-color:var(--accent)}
 .traffic-legend{position:absolute;bottom:148px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;display:none;align-items:center;gap:8px;box-shadow:var(--shadow);white-space:nowrap}
@@ -414,6 +421,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 #weekChart,#monthChart{width:100%;display:block}
 
 /* Battery saver indicator */
+
+/* Compass widget */
+.compass-btn{position:absolute;right:10px;top:148px;z-index:20;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1.5px solid rgba(0,0,0,.12);box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.compass-btn.heading-up{background:var(--accent);border-color:var(--accent)}
+.compass-btn:active{transform:scale(.9)}
+.compass-svg{transition:transform .3s ease}
+[data-theme="dark"] .compass-btn{background:rgba(26,31,46,.92);border-color:rgba(255,255,255,.15)}
+[data-theme="dark"] .compass-btn.heading-up{background:var(--accent)}
+
+/* Map rotation — solo el div del mapa */
+#map{transition:transform .4s ease;transform-origin:center center}
+
+/* Center on me button */
+.center-btn{position:absolute;right:10px;top:198px;z-index:20;width:34px;height:34px;border-radius:8px;border:2px solid rgba(0,0,0,.15);background:rgba(255,255,255,.92);backdrop-filter:blur(8px);box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.center-btn:active{transform:scale(.9)}
+[data-theme="dark"] .center-btn{background:rgba(26,31,46,.92);border-color:rgba(255,255,255,.15)}
+
 .battery-badge{position:absolute;top:12px;right:54px;z-index:20;background:rgba(34,197,94,.9);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;display:none;backdrop-filter:blur(6px)}
 .battery-badge.show{display:block}
 
@@ -551,6 +575,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div><div class="wb-temp" id="wbTemp">--°C</div><div class="wb-desc" id="wbDesc">cargando…</div></div>
   </div>
   <div class="battery-badge" id="batteryBadge">🔋 Ahorro</div>
+  <button class="compass-btn" id="compassBtn" onclick="toggleHeadingUp()" title="Brújula">
+    <svg id="compassSvg" width="22" height="22" viewBox="0 0 22 22">
+      <circle cx="11" cy="11" r="10" fill="none" stroke="#ddd" stroke-width="1.5"/>
+      <!-- Aguja: rojo=norte, gris=sur -->
+      <g id="compassNeedle" class="compass-needle" style="transform-origin:11px 11px">
+        <polygon points="11,3 13,11 11,9 9,11" fill="#dd3256"/>
+        <polygon points="11,19 13,11 11,13 9,11" fill="#9ca3af"/>
+      </g>
+      <circle cx="11" cy="11" r="2" fill="#1f244c"/>
+    </svg>
+  </button>
   <div class="offline-badge" id="offlineBadge">📵 Sin conexión · mapa en caché</div>
   <div class="replay-controls" id="replayControls">
     <span class="replay-progress" id="replayProgress">▶ Replay</span>
@@ -560,6 +595,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   <div class="follow-badge" id="followBadge"><div class="follow-dot"></div>Siguiendo ruta</div>
   <div class="gps-tag" id="gpsTag"><div class="gps-pulse"></div><span id="gpsTagText">Buscando GPS…</span></div>
   <button class="traffic-btn" id="trafficBtn" onclick="toggleTraffic()">🚦</button>
+
+  <!-- Brújula / Heading-up toggle -->
+  <button class="compass-btn" id="compassBtn" onclick="toggleHeadingUp()" title="Modo brújula">
+    <svg class="compass-svg" id="compassSvg" width="32" height="32" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <!-- Aguja Norte (roja) -->
+      <polygon id="compassN" points="16,4 18.5,16 16,14 13.5,16" fill="#dc2626"/>
+      <!-- Aguja Sur (gris) -->
+      <polygon id="compassS" points="16,28 18.5,16 16,18 13.5,16" fill="#9ca3af"/>
+      <!-- Centro -->
+      <circle cx="16" cy="16" r="2.5" fill="#1f244c"/>
+      <!-- N label -->
+      <text x="16" y="3.5" text-anchor="middle" font-size="5" fill="#dc2626" font-weight="bold" font-family="sans-serif">N</text>
+    </svg>
+  </button>
+
+  <!-- Centrar en mi posición -->
+  <button class="center-btn" id="centerBtn" onclick="centerOnMe()" title="Centrar">📍</button>
   <div class="traffic-legend" id="trafficLegend">
     <div class="tl-dot" style="background:#00b300"></div>Fluido
     <div class="tl-dot" style="background:#ff9500"></div>Lento
@@ -1140,11 +1193,10 @@ let _lastHeading = 0;
 
 function placeMarker(lat, lng, acc, heading){
   // Heading: 0=Norte, 90=Este, etc. NaN = quieto
-  // Heading GPS: 0=Norte, 90=Este. Corregimos 180° porque en Android
-  // el heading reporta la dirección de dónde venís, no hacia dónde vas
-  const rawH = (heading != null && !isNaN(heading)) ? heading : null;
-  const h = rawH != null ? rawH : _lastHeading;
-  if (rawH != null) _lastHeading = h;
+  // Bearing calculado desde coordenadas GPS (correcto, independiente del dispositivo)
+  const h = (heading != null && !isNaN(heading)) ? heading : _lastHeading;
+  if (heading != null && !isNaN(heading)) _lastHeading = h;
+  onHeadingUpdate(h);
 
   const isMoving = heading != null && !isNaN(heading);
 
@@ -1206,6 +1258,7 @@ function stopActivity(){
   releaseWakeLock();
   stopIntervals();
   clearTimeout(_autoPauseTimer);
+  if(_headingUpActive){_headingUpActive=false;rotateMap(0);document.getElementById('compassBtn')?.classList.remove('heading-up');}
   const elapsed=getElapsed();
   const avg=speedSamples.length?speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length:0;
   const pace=avg>.5?60/avg:null;
@@ -1262,7 +1315,13 @@ function onPos(pos){
     }
   }
   currentPos={lat,lng};
-  placeMarker(lat,lng,accuracy,pos.coords.heading);
+  // Calcular bearing desde el punto anterior (más confiable que pos.coords.heading)
+  let gpsBearing = null;
+  if(lastPos && haversine(lastPos[0],lastPos[1],lat,lng) > 0.003){
+    gpsBearing = calcBearing(lastPos[0],lastPos[1],lat,lng);
+    if(!_deviceOrientOk) updateCompass(gpsBearing); // usar GPS bearing para brújula si no hay sensor
+  }
+  placeMarker(lat,lng,accuracy,gpsBearing);
   panToUser(lat,lng);
   if(isRecording&&!isPaused){
     if(lastPos)totalDist+=haversine(lastPos[0],lastPos[1],lat,lng);
@@ -2873,6 +2932,161 @@ function sendEmergency(){
 }
 
 // ════════════════════════════════
+// BRÚJULA + MODO HEADING-UP
+// ════════════════════════════════
+let _headingUpActive = false;
+let _currentHeading  = 0;
+let _mapRotation     = 0;
+
+function toggleHeadingUp(){
+  _headingUpActive = !_headingUpActive;
+  const btn = document.getElementById('compassBtn');
+  btn?.classList.toggle('heading-up', _headingUpActive);
+  if(!_headingUpActive){
+    // Volver al norte arriba
+    rotateMap(0);
+    updateCompassNeedle(0);
+  } else {
+    rotateMap(_currentHeading);
+    showToast('🧭 Modo dirección activado');
+  }
+}
+
+function centerOnMe(){
+  if(!currentPos) return;
+  _lastPanTime = 0; // reset throttle
+  panToUser(currentPos.lat, currentPos.lng);
+  showToast('📍 Centrado');
+}
+
+function rotateMap(heading){
+  _mapRotation = heading;
+  const mapEl = document.getElementById('map');
+  if(!mapEl) return;
+  // Rotar el mapa en sentido opuesto al heading
+  mapEl.style.transform        = `rotate(${-heading}deg)`;
+  mapEl.style.transformOrigin  = 'center center';
+  // Compensar el tamaño para que no queden bordes blancos al rotar
+  // Escalar ligeramente para cubrir las esquinas rotadas
+  const angle = Math.abs(heading % 90) * Math.PI / 180;
+  const scale = Math.cos(angle) + Math.sin(angle);
+  mapEl.style.transform = `rotate(${-heading}deg) scale(${Math.max(1, scale)})`;
+}
+
+function updateCompassNeedle(heading){
+  _currentHeading = heading;
+  const svgEl = document.getElementById('compassSvg');
+  if(!svgEl) return;
+  // La aguja rota en sentido opuesto al heading para que N siempre apunte al norte real
+  svgEl.style.transform = `rotate(${-heading}deg)`;
+  svgEl.style.transformOrigin = '16px 16px';
+}
+
+// Se llama desde placeMarker cuando hay nuevo heading
+function onHeadingUpdate(heading){
+  if(heading == null || isNaN(heading)) return;
+  updateCompassNeedle(heading);
+  if(_headingUpActive) rotateMap(heading);
+}
+
+// Sobrescribir panToUser para compensar la rotación del mapa
+const _origPanToUser = panToUser;
+function panToUser(lat, lng){
+  const now = Date.now();
+  if(now - _lastPanTime < 1000) return;
+  if(_lastPanLat && haversine(_lastPanLat, _lastPanLng, lat, lng) < 0.005) return;
+  _lastPanTime = now;
+  _lastPanLat = lat; _lastPanLng = lng;
+  try{
+    const userPx  = map.latLngToContainerPoint([lat, lng]);
+    const sheet   = document.querySelector('.bottom-sheet');
+    const sheetH  = sheet ? sheet.offsetHeight : 140;
+    const target  = map.containerPointToLatLng(
+      L.point(userPx.x, userPx.y + sheetH * 0.5)
+    );
+    map.panTo(target, {animate:true, duration:0.5, easeLinearity:0.5});
+  }catch(e){
+    map.panTo([lat, lng], {animate:true, duration:0.5});
+  }
+}
+
+
+// ════════════════════════════════
+// BEARING DESDE COORDENADAS GPS
+// (no depende de cómo sostiene el teléfono)
+// ════════════════════════════════
+function calcBearing(lat1, lng1, lat2, lng2){
+  const toRad = d => d * Math.PI / 180;
+  const φ1 = toRad(lat1), φ2 = toRad(lat2);
+  const Δλ = toRad(lng2 - lng1);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+// ════════════════════════════════
+// BRÚJULA + HEADING-UP MODE
+// ════════════════════════════════
+let _headingUp = false;
+let _compassDeg = 0; // grados del norte magnético
+let _deviceOrientOk = false;
+
+function toggleHeadingUp(){
+  _headingUp = !_headingUp;
+  document.getElementById('compassBtn').classList.toggle('heading-up', _headingUp);
+  if(!_headingUp){
+    // Volver mapa a norte arriba
+    map.getContainer().style.transform = '';
+    map.getContainer().style.transformOrigin = '';
+    showToast('🧭 Norte arriba');
+  } else {
+    showToast('🧭 Heading-up activado');
+  }
+}
+
+function updateCompass(bearing){
+  _compassDeg = bearing;
+  // Rotar aguja: siempre apunta al norte real
+  const needle = document.getElementById('compassNeedle');
+  if(needle) needle.style.transform = `rotate(${-bearing}deg)`;
+  // Si heading-up: rotar el contenedor del mapa
+  if(_headingUp){
+    const c = map.getContainer();
+    c.style.transformOrigin = '50% 50%';
+    c.style.transform = `rotate(${-bearing}deg)`;
+  }
+}
+
+// Intentar usar DeviceOrientationEvent para brújula real
+function initCompass(){
+  if(typeof DeviceOrientationEvent !== 'undefined' &&
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
+    // iOS 13+ requiere permiso
+    DeviceOrientationEvent.requestPermission()
+      .then(p => { if(p==='granted') listenOrientation(); })
+      .catch(()=>{});
+  } else {
+    listenOrientation();
+  }
+}
+function listenOrientation(){
+  window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+  window.addEventListener('deviceorientation', handleOrientation, true);
+}
+function handleOrientation(e){
+  let heading = null;
+  if(e.absolute && e.alpha != null){
+    heading = (360 - e.alpha) % 360; // alpha 0=norte en algunos dispositivos
+  } else if(e.webkitCompassHeading != null){
+    heading = e.webkitCompassHeading; // iOS
+  }
+  if(heading != null){
+    _deviceOrientOk = true;
+    updateCompass(heading);
+  }
+}
+
+// ════════════════════════════════
 // BOOT
 // ════════════════════════════════
 renderHistory();
@@ -2888,6 +3102,7 @@ initVoice();
 initBatterySaver();
 initEmergency();
 initMap();
+initCompass();
 renderTotalStats();
 loadPersonalBests();
 handleShareLink();
