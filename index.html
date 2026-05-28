@@ -77,7 +77,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 .offline-badge.show{display:flex}
 
 /* Brújula */
-.compass-btn{position:absolute;right:10px;top:138px;z-index:20;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s}
+.compass-btn{position:absolute;right:10px;top:138px;z-index:20;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s}
 .compass-btn:active{transform:scale(.93)}
 /* heading-up removido */
 .compass-needle{transition:transform .3s ease}
@@ -893,7 +893,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       🌤️ Clima: <a href="https://open-meteo.com" target="_blank">Open-Meteo</a> (gratis)<br>
       🚦 Tránsito: <a href="https://developer.tomtom.com" target="_blank">TomTom Traffic</a><br>
       📡 GPS: API nativa del navegador<br><br>
-      <strong>Contacto:</strong> <a href="mailto:knive.sys@gmail.com">Mail</a>
+      <strong>Contacto:</strong> <a href="mailto:maurikrause1983@gmail.com">Mail</a>
     </div>
   </div>
 </div>
@@ -1197,6 +1197,7 @@ function tryGPS(){
   },()=>showGpsTag('Activá el GPS del dispositivo'),{enableHighAccuracy:true,timeout:12000});
 }
 let _lastHeading = 0;
+let _prevRawPos = null;
 
 function placeMarker(lat, lng, acc, heading){
   // Heading: 0=Norte, 90=Este, etc. NaN = quieto
@@ -1232,7 +1233,7 @@ function placeMarker(lat, lng, acc, heading){
 function startActivity(){
   if(!navigator.geolocation){showToast('⚠️ GPS no disponible');return;}
   isRecording=true;isPaused=false;startTime=Date.now();pausedTime=0;
-  routeCoords=[];speedLog=[];altLog=[];totalDist=0;maxSpeed=0;speedSamples=[];lastPos=null;firedAlerts.clear();
+  routeCoords=[];speedLog=[];altLog=[];totalDist=0;maxSpeed=0;speedSamples=[];lastPos=null;_prevRawPos=null;firedAlerts.clear();
   routeLine.setLatLngs([]);
   _lastPanTime=0;_lastPanLat=0;_lastPanLng=0; // reset pan throttle
   if(currentPos)map.setView([currentPos.lat,currentPos.lng],16,{animate:false});
@@ -1322,14 +1323,28 @@ function onPos(pos){
     }
   }
   currentPos={lat,lng};
-  // Calcular bearing desde el punto anterior (más confiable que pos.coords.heading)
-  let gpsBearing = null;
-  if(lastPos && haversine(lastPos[0],lastPos[1],lat,lng) > 0.003){
-    gpsBearing = calcBearing(lastPos[0],lastPos[1],lat,lng);
-    if(!_deviceOrientOk) updateCompass(gpsBearing); // usar GPS bearing para brújula si no hay sensor
+
+  // ── Dirección de marcha ──────────────────────────────────────
+  // 1. pos.coords.heading: calculado por el chip GPS con Doppler
+  //    (más preciso en movimiento, independiente de cómo sostenés el teléfono)
+  // 2. Fallback: bearing desde coordenadas CRUDAS (sin suavizar)
+  let bearing = null;
+  const chipHeading = pos.coords.heading;
+  const spd = pos.coords.speed;
+
+  if(spd != null && spd > 0.5 && chipHeading != null && !isNaN(chipHeading)){
+    // Chip GPS confiable cuando velocidad > ~1.8 km/h
+    bearing = chipHeading;
+  } else if(_prevRawPos){
+    const rawDist = haversine(_prevRawPos[0],_prevRawPos[1],rawLat,rawLng);
+    if(rawDist > 0.005) bearing = calcBearing(_prevRawPos[0],_prevRawPos[1],rawLat,rawLng);
   }
-  placeMarker(lat,lng,accuracy,gpsBearing);
-  panToUser(lat,lng);
+  _prevRawPos = [rawLat, rawLng]; // siempre coords crudas
+
+  if(bearing != null){ _lastHeading = bearing; updateCompass(bearing); }
+
+  placeMarker(lat,lng,accuracy,bearing);
+  // Sin centrado automático — el usuario controla el mapa
   if(isRecording&&!isPaused){
     if(lastPos)totalDist+=haversine(lastPos[0],lastPos[1],lat,lng);
     lastPos=[lat,lng];routeCoords.push([lat,lng]);routeLine.setLatLngs(routeCoords);
@@ -3044,10 +3059,13 @@ function toggleHeadingUp(){
 
 function updateCompass(bearing){
   _compassDeg = bearing;
-  // Rotar aguja: siempre apunta al norte real
   const needle = document.getElementById('compassNeedle');
   if(needle) needle.style.transform = `rotate(${-bearing}deg)`;
-  // Mapa siempre norte arriba — sin rotación
+  // Mostrar rumbo cardinal en el botón
+  const dirs = ['N','NE','E','SE','S','SO','O','NO','N'];
+  const dir = dirs[Math.round(bearing/45)];
+  const btn = document.getElementById('compassBtn');
+  if(btn) btn.title = `🧭 ${Math.round(bearing)}° ${dir}`;
 }
 
 // Intentar usar DeviceOrientationEvent para brújula real
