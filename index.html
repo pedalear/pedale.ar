@@ -79,7 +79,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 /* Brújula */
 .compass-btn{position:absolute;right:10px;top:138px;z-index:20;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s}
 .compass-btn:active{transform:scale(.93)}
-.compass-btn.heading-up{background:var(--accent);border-color:var(--accent)}
+/* heading-up removido */
 .compass-needle{transition:transform .3s ease}
 [data-theme="dark"] .compass-btn{background:rgba(26,31,46,.92);border-color:rgba(255,255,255,.12)}
 .traffic-btn{position:absolute;right:10px;top:95px;z-index:20;width:34px;height:34px;border-radius:8px;border:2px solid rgba(0,0,0,.15);background:var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s}
@@ -424,7 +424,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 
 /* Compass widget */
 .compass-btn{position:absolute;right:10px;top:148px;z-index:20;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1.5px solid rgba(0,0,0,.12);box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.compass-btn.heading-up{background:var(--accent);border-color:var(--accent)}
+/* heading-up removido */
 .compass-btn:active{transform:scale(.9)}
 .compass-svg{transition:transform .3s ease}
 [data-theme="dark"] .compass-btn{background:rgba(26,31,46,.92);border-color:rgba(255,255,255,.15)}
@@ -575,17 +575,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
     <div><div class="wb-temp" id="wbTemp">--°C</div><div class="wb-desc" id="wbDesc">cargando…</div></div>
   </div>
   <div class="battery-badge" id="batteryBadge">🔋 Ahorro</div>
-  <button class="compass-btn" id="compassBtn" onclick="toggleHeadingUp()" title="Brújula">
-    <svg id="compassSvg" width="22" height="22" viewBox="0 0 22 22">
-      <circle cx="11" cy="11" r="10" fill="none" stroke="#ddd" stroke-width="1.5"/>
+  <div class="compass-btn" id="compassBtn" title="Norte">
+    <svg id="compassSvg" width="24" height="24" viewBox="0 0 24 24">
+      <!-- Fondo -->
+      <circle cx="12" cy="12" r="11" fill="white" fill-opacity=".0"/>
+      <!-- Letras cardinales -->
+      <text x="12" y="5.5" text-anchor="middle" font-size="4" font-weight="700" fill="#9ca3af" font-family="sans-serif">N</text>
+      <text x="12" y="22" text-anchor="middle" font-size="4" font-weight="700" fill="#9ca3af" font-family="sans-serif">S</text>
+      <text x="2.5" y="13" text-anchor="middle" font-size="4" font-weight="700" fill="#9ca3af" font-family="sans-serif">O</text>
+      <text x="21.5" y="13" text-anchor="middle" font-size="4" font-weight="700" fill="#9ca3af" font-family="sans-serif">E</text>
       <!-- Aguja: rojo=norte, gris=sur -->
-      <g id="compassNeedle" class="compass-needle" style="transform-origin:11px 11px">
-        <polygon points="11,3 13,11 11,9 9,11" fill="#dd3256"/>
-        <polygon points="11,19 13,11 11,13 9,11" fill="#9ca3af"/>
+      <g id="compassNeedle" class="compass-needle" style="transform-origin:12px 12px">
+        <polygon points="12,5 13.5,12 12,10.5 10.5,12" fill="#dd3256"/>
+        <polygon points="12,19 13.5,12 12,13.5 10.5,12" fill="#cbd5e1"/>
       </g>
-      <circle cx="11" cy="11" r="2" fill="#1f244c"/>
+      <!-- Centro -->
+      <circle cx="12" cy="12" r="2" fill="#1f244c"/>
     </svg>
-  </button>
+  </div>
   <div class="offline-badge" id="offlineBadge">📵 Sin conexión · mapa en caché</div>
   <div class="replay-controls" id="replayControls">
     <span class="replay-progress" id="replayProgress">▶ Replay</span>
@@ -886,7 +893,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       🌤️ Clima: <a href="https://open-meteo.com" target="_blank">Open-Meteo</a> (gratis)<br>
       🚦 Tránsito: <a href="https://developer.tomtom.com" target="_blank">TomTom Traffic</a><br>
       📡 GPS: API nativa del navegador<br><br>
-      <strong>Contacto:</strong> <a href="mailto:knive.sys@gmail.com">Mail</a>
+      <strong>Contacto:</strong> <a href="mailto:maurikrause1983@gmail.com">Mail</a>
     </div>
   </div>
 </div>
@@ -3027,21 +3034,12 @@ function calcBearing(lat1, lng1, lat2, lng2){
 // ════════════════════════════════
 // BRÚJULA + HEADING-UP MODE
 // ════════════════════════════════
-let _headingUp = false;
-let _compassDeg = 0; // grados del norte magnético
+let _compassDeg = 0;
 let _deviceOrientOk = false;
 
 function toggleHeadingUp(){
-  _headingUp = !_headingUp;
-  document.getElementById('compassBtn').classList.toggle('heading-up', _headingUp);
-  if(!_headingUp){
-    // Volver mapa a norte arriba
-    map.getContainer().style.transform = '';
-    map.getContainer().style.transformOrigin = '';
-    showToast('🧭 Norte arriba');
-  } else {
-    showToast('🧭 Heading-up activado');
-  }
+  // Solo muestra/oculta el panel de la brújula — sin rotar el mapa
+  showToast('🧭 Norte arriba siempre');
 }
 
 function updateCompass(bearing){
@@ -3049,12 +3047,7 @@ function updateCompass(bearing){
   // Rotar aguja: siempre apunta al norte real
   const needle = document.getElementById('compassNeedle');
   if(needle) needle.style.transform = `rotate(${-bearing}deg)`;
-  // Si heading-up: rotar el contenedor del mapa
-  if(_headingUp){
-    const c = map.getContainer();
-    c.style.transformOrigin = '50% 50%';
-    c.style.transform = `rotate(${-bearing}deg)`;
-  }
+  // Mapa siempre norte arriba — sin rotación
 }
 
 // Intentar usar DeviceOrientationEvent para brújula real
@@ -3070,21 +3063,10 @@ function initCompass(){
   }
 }
 function listenOrientation(){
-  window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-  window.addEventListener('deviceorientation', handleOrientation, true);
+  // No usamos DeviceOrientation — no es confiable en posición vertical
+  // La brújula usa el bearing calculado desde coordenadas GPS
 }
-function handleOrientation(e){
-  let heading = null;
-  if(e.absolute && e.alpha != null){
-    heading = (360 - e.alpha) % 360; // alpha 0=norte en algunos dispositivos
-  } else if(e.webkitCompassHeading != null){
-    heading = e.webkitCompassHeading; // iOS
-  }
-  if(heading != null){
-    _deviceOrientOk = true;
-    updateCompass(heading);
-  }
-}
+function handleOrientation(e){ /* no-op */ }
 
 // ════════════════════════════════
 // BOOT
