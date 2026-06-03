@@ -45,7 +45,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 
 /* Modo grabando: se pliegan header y tabs para maximizar el mapa */
 body.riding header{max-height:0;padding-top:0;padding-bottom:0;opacity:0;border-bottom:none}
-body.riding .tabs{max-height:0;opacity:0;border-bottom:none}
 
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab-icon{font-size:14px;display:block;margin-bottom:1px}
@@ -54,7 +53,7 @@ body.riding .tabs{max-height:0;opacity:0;border-bottom:none}
 
 /* ══════════════ MAP SCREEN ══════════════ */
 .map-screen{position:relative;flex:1;overflow:hidden}
-#map{position:absolute;inset:0;z-index:0}
+#map{position:absolute;top:50%;left:50%;width:145vmax;height:145vmax;transform:translate(-50%,-50%) rotate(0deg);transform-origin:center center;transition:transform .3s ease-out;z-index:0}
 .leaflet-container{background:#e8e8e4!important}
 #weatherOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 /* weather layers */
@@ -102,9 +101,9 @@ body.riding .tabs{max-height:0;opacity:0;border-bottom:none}
 .idle-hint{text-align:center;font-size:13px;color:var(--muted);font-weight:500}
 .active-view{display:none;flex-direction:column;gap:12px}
 .live-metrics{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.speed-hero{text-align:center;padding:2px 0 6px;display:flex;align-items:baseline;justify-content:center;gap:8px}
-.speed-hero-val{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:.9;color:var(--accent);letter-spacing:1px}
-.speed-hero-unit{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);letter-spacing:1px}
+.speed-hero{text-align:center;padding:0 0 2px;display:flex;align-items:baseline;justify-content:center;gap:6px}
+.speed-hero-val{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:.9;color:var(--accent);letter-spacing:1px}
+.speed-hero-unit{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);letter-spacing:1px}
 .live-metric{text-align:center;padding:2px 0;border-right:1px solid var(--border)}
 .live-metric:last-child{border-right:none}
 .lm-val{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;color:var(--text);letter-spacing:1px}
@@ -445,7 +444,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   transform:translate(-50%,-50%);
   z-index:450;pointer-events:none;display:none;
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));
-  transition:transform .3s ease-out;
 }
 #userArrow.show{display:block}
 
@@ -1178,6 +1176,7 @@ function initMap(){
   map=L.map('map',{center:[-31.65,-60.7],zoom:15,zoomControl:false,attributionControl:false});
   _baseTileLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'}).addTo(map);
   routeLine=L.polyline([],{color:'#ea580c',weight:4.5,opacity:.88,lineJoin:'round'}).addTo(map);
+  setTimeout(()=>map.invalidateSize(),100);
   tryGPS();
 }
 function tryGPS(){
@@ -1230,20 +1229,22 @@ function startActivity(){
   startIntervals();
   showToast(activityMode==='bike'?'🚴 ¡A pedalear!':'🏃 ¡A correr!');
 }
-function pauseActivity(){
+function pauseActivity(keepGPS){
   if(!isPaused){
     isPaused=true;pauseStart=Date.now();
-    if(watchId){navigator.geolocation.clearWatch(watchId);watchId=null;}
+    // En auto-pausa mantenemos el GPS activo para detectar cuándo arrancás de nuevo
+    if(!keepGPS && watchId){navigator.geolocation.clearWatch(watchId);watchId=null;}
     clearInterval(timerInterval);releaseWakeLock();
     document.getElementById('btnPause').innerHTML='▶ &nbsp;SEGUIR';
     document.getElementById('recDot').className='rec-dot paused';
-    showToast('⏸ Pausado');
+    if(!keepGPS) showToast('⏸ Pausado');
   }else{
     isPaused=false;pausedTime+=Date.now()-pauseStart;
-    startWatch();startTimer();acquireWakeLock();
+    if(!watchId) startWatch();
+    startTimer();acquireWakeLock();
     document.getElementById('btnPause').innerHTML='⏸ &nbsp;PAUSA';
     document.getElementById('recDot').className='rec-dot on';
-    showToast('▶ Continuando');
+    if(!keepGPS) showToast('▶ Continuando');
   }
 }
 function stopActivity(){
@@ -1314,6 +1315,8 @@ function onPos(pos){
     }
   }
   currentPos={lat,lng};
+  // Auto-reanudar: si está auto-pausado y detecta movimiento
+  if(isRecording && isPaused && _wasAutoPaused) checkAutoPause(kmh);
 
   // ── Dirección de marcha ──────────────────────────────────────
   // 1. pos.coords.heading: calculado por el chip GPS con Doppler
@@ -2479,7 +2482,7 @@ function checkAutoPause(kmh){
       _autoPauseTimer=setTimeout(()=>{
         if(!isPaused&&isRecording){
           _wasAutoPaused=true;
-          pauseActivity();
+          pauseActivity(true); // mantener GPS para auto-reanudar
           showToast('⏸ Auto-pausado — sin movimiento');
         }
         _autoPauseTimer=null;
@@ -2489,8 +2492,8 @@ function checkAutoPause(kmh){
     clearTimeout(_autoPauseTimer);_autoPauseTimer=null;
     if(isPaused&&_wasAutoPaused){
       _wasAutoPaused=false;
-      pauseActivity();
-      showToast('▶ Auto-reanudado');
+      pauseActivity(true);
+      showToast('▶ Auto-reanudado — ¡a darle!');
     }
   }
 }
@@ -2975,21 +2978,23 @@ let _userPanLat = 0, _userPanLng = 0, _lastPanT = 0;
 function navUpdate(lat, lng, bearing){
   if(!map) return;
 
-  // 1. CENTRAR — el usuario siempre en el centro de la pantalla.
-  //    El mapa se mueve, pero NUNCA rota (norte siempre arriba), estilo Strava.
-  map.panTo([lat, lng], {animate:true, duration:0.5, easeLinearity:1});
+  // 1. CENTRAR — el usuario SIEMPRE exactamente en el centro (sin throttle).
+  //    Esto es clave: si no está centrado, al rotar el recorrido se desvía.
+  map.setView([lat, lng], map.getZoom(), {animate:false});
 
-  // 2. La FLECHA gira para mostrar la dirección (el mapa queda fijo).
-  if(bearing != null && !isNaN(bearing)){
+  // 2. ROTAR el mapa para que "adelante" quede arriba (estilo Google Maps).
+  //    #map es más grande que la pantalla, así que al rotar no hay esquinas blancas.
+  if(_navMode && bearing != null && !isNaN(bearing)){
     _navBearing = bearing;
-    const arrow = document.getElementById('userArrow');
-    if(arrow) arrow.style.transform = `translate(-50%,-50%) rotate(${bearing}deg)`;
+    const el = document.getElementById('map');
+    if(el) el.style.transform = `translate(-50%,-50%) rotate(${-bearing}deg)`;
     updateCompass(bearing);
   }
 
-  // 3. Mostrar el indicador del usuario
+  // 3. Mostrar el indicador del usuario (fijo, apuntando arriba = adelante)
   document.getElementById('userArrow')?.classList.add('show');
 }
+
 
 
 
@@ -3024,11 +3029,12 @@ const centerOnUser = centerOnMe; // alias por compatibilidad
 
 // Quita la rotación del mapa (al parar la actividad)
 function resetMapRotation(){
-  const arrow = document.getElementById('userArrow');
-  if(arrow) arrow.style.transform = 'translate(-50%,-50%) rotate(0deg)';
+  const el = document.getElementById('map');
+  if(el) el.style.transform = 'translate(-50%,-50%) rotate(0deg)';
   _navBearing = 0;
   updateCompass(0);
 }
+
 
 
 // Compatibilidad: funciones que el resto del código todavía llama
