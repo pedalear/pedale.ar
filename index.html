@@ -2645,9 +2645,14 @@ const GPS_SMOOTH=4; // últimas N lecturas
 function smoothGPS(lat,lng){
   _gpsBuffer.push([lat,lng]);
   if(_gpsBuffer.length>GPS_SMOOTH)_gpsBuffer.shift();
-  const avgLat=_gpsBuffer.reduce((s,p)=>s+p[0],0)/_gpsBuffer.length;
-  const avgLng=_gpsBuffer.reduce((s,p)=>s+p[1],0)/_gpsBuffer.length;
-  return[avgLat,avgLng];
+  // Promedio PONDERADO: el punto más reciente pesa mucho más que los viejos.
+  // Filtra el ruido del GPS sin retrasar tu posición (antes te marcaba corrido).
+  let wLat=0,wLng=0,wSum=0;
+  _gpsBuffer.forEach((p,i)=>{
+    const w=(i+1)*(i+1); // pesos crecientes: el último punto domina
+    wLat+=p[0]*w; wLng+=p[1]*w; wSum+=w;
+  });
+  return[wLat/wSum, wLng/wSum];
 }
 
 // ════════════════════════════════
