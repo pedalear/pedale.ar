@@ -555,6 +555,34 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px}
+
+/* ══ VELOCÍMETRO PANTALLA COMPLETA ══ */
+#speedoScreen{position:fixed;inset:0;z-index:3000;display:none;flex-direction:column;align-items:center;
+  background:linear-gradient(160deg,#1f244c 0%,#592452 55%,#1a1a2e 100%);
+  padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 20px);
+  color:#fff;animation:spdoIn .25s ease}
+#speedoScreen.show{display:flex}
+@keyframes spdoIn{from{opacity:0}to{opacity:1}}
+.spdo-back{align-self:flex-start;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:9px 16px;border-radius:12px;cursor:pointer;backdrop-filter:blur(8px)}
+.spdo-back:active{transform:scale(.96)}
+.spdo-mode{margin-top:10px;font-size:12px;font-weight:800;letter-spacing:2.5px;color:var(--sunset1);text-transform:uppercase;opacity:.9}
+.spdo-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.spdo-speed{font-family:'Bebas Neue',sans-serif;font-size:38vw;line-height:.82;color:#fff;letter-spacing:2px;
+  text-shadow:0 4px 30px rgba(247,157,35,.35)}
+.spdo-unit{font-family:'Bebas Neue',sans-serif;font-size:8vw;color:var(--sunset1);letter-spacing:3px;margin-top:6px}
+.spdo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:420px;margin-bottom:18px}
+.spdo-cell{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 10px;text-align:center;backdrop-filter:blur(6px)}
+.spdo-cell-val{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:#fff;letter-spacing:1px}
+.spdo-cell-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.55);margin-top:4px}
+.spdo-controls{display:flex;gap:12px;width:100%;max-width:420px}
+.spdo-ctrl-btn{flex:1;height:52px;border-radius:15px;border:none;background:rgba(255,255,255,.15);
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px)}
+.spdo-ctrl-btn.danger{background:var(--red)}
+.spdo-ctrl-btn:active{transform:scale(.97)}
+.spdo-ctrl-btn.paused{background:var(--green)}
+/* Botón para abrir el velocímetro (en controles activos) */
+.btn-speedo{width:46px;padding:0;flex:none;background:var(--surface2);color:var(--accent);font-size:19px;border:1.5px solid var(--border)}
 </style>
 </head>
 <body>
@@ -647,11 +675,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
       <div class="active-controls">
         <div class="rec-dot on" id="recDot"></div>
         <div class="wl-dot" id="wlDot"></div>
+        <button class="btn btn-speedo" onclick="openSpeedo()" title="Velocímetro">⏱</button>
         <button class="btn btn-secondary" id="btnPause" onclick="pauseActivity()">⏸ &nbsp;PAUSA</button>
         <button class="btn btn-share" onclick="shareCurrentActivity()">↗ SHARE</button>
         <button class="btn btn-danger" onclick="stopActivity()">⏹</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- SPEEDOMETER FULLSCREEN -->
+<div id="speedoScreen">
+  <button class="spdo-back" onclick="closeSpeedo()">🗺️ &nbsp;Mapa</button>
+  <div class="spdo-mode" id="spdoMode">EN BICI</div>
+  <div class="spdo-main">
+    <div class="spdo-speed" id="spdoSpeed">0.0</div>
+    <div class="spdo-unit" id="spdoUnit">km/h</div>
+  </div>
+  <div class="spdo-grid">
+    <div class="spdo-cell"><div class="spdo-cell-val" id="spdoTime">00:00</div><div class="spdo-cell-lbl">Tiempo</div></div>
+    <div class="spdo-cell"><div class="spdo-cell-val" id="spdoDist">0.00</div><div class="spdo-cell-lbl" id="spdoDistLbl">km</div></div>
+    <div class="spdo-cell"><div class="spdo-cell-val" id="spdoAvg">0.0</div><div class="spdo-cell-lbl" id="spdoAvgLbl">media km/h</div></div>
+    <div class="spdo-cell"><div class="spdo-cell-val" id="spdoMax">0.0</div><div class="spdo-cell-lbl" id="spdoMaxLbl">máx km/h</div></div>
+  </div>
+  <div class="spdo-controls">
+    <button class="spdo-ctrl-btn" id="spdoPause" onclick="pauseActivity()">⏸ Pausa</button>
+    <button class="spdo-ctrl-btn danger" onclick="stopActivity()">⏹ Terminar</button>
   </div>
 </div>
 
@@ -1293,6 +1342,7 @@ function stopActivity(){
 }
 function resetUI(){
   isRecording=false;
+  closeSpeedo();
   document.body.classList.remove('riding');
   setTimeout(()=>map&&map.invalidateSize(),400);
   const sn=document.getElementById('streetName');if(sn)sn.textContent='';
@@ -1391,6 +1441,7 @@ function updateStats(kmh){
   checkEmergencyStop(kmh);
   updateETA(totalDist,avg);
   drawSpeedGraph(speedLog,maxSpeed);
+  updateSpeedo();
 }
 function startTimer(){
   clearInterval(timerInterval);
@@ -3176,6 +3227,42 @@ ${pts}
 </gpx>`;
   downloadText(gpx, `pedalear-${rec.date.replace(/\//g,'-')}.gpx`, 'application/gpx+xml');
   showToast('🗺️ GPX descargado · subilo a Strava/Garmin');
+}
+
+
+// ════════════════════════════════
+// VELOCÍMETRO PANTALLA COMPLETA
+// ════════════════════════════════
+let _speedoOpen = false;
+function openSpeedo(){
+  _speedoOpen = true;
+  const s = document.getElementById('speedoScreen');
+  s.classList.add('show');
+  document.getElementById('spdoMode').textContent = activityMode==='bike' ? 'EN BICI' : 'CORRIENDO';
+  updateSpeedo();
+  try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(()=>{}); }catch(e){}
+}
+function closeSpeedo(){
+  _speedoOpen = false;
+  document.getElementById('speedoScreen').classList.remove('show');
+}
+function updateSpeedo(){
+  if(!_speedoOpen) return;
+  const u = getUnitLabel();
+  const g = id => document.getElementById(id);
+  g('spdoSpeed').textContent = g('lmSpeed').textContent;
+  g('spdoUnit').textContent = u.speed;
+  g('spdoTime').textContent = g('lmTime').textContent;
+  g('spdoDist').textContent = g('lmDist').textContent;
+  g('spdoDistLbl').textContent = u.dist;
+  g('spdoAvg').textContent = g('statAvgSpeed') ? g('statAvgSpeed').textContent : '0.0';
+  g('spdoMax').textContent = g('statMaxSpeed') ? g('statMaxSpeed').textContent : '0.0';
+  g('spdoAvgLbl').textContent = 'media ' + u.speed;
+  g('spdoMaxLbl').textContent = 'máx ' + u.speed;
+  // Reflejar estado de pausa en el botón
+  const pb = g('spdoPause');
+  if(isPaused){ pb.textContent='▶ Seguir'; pb.classList.add('paused'); }
+  else { pb.textContent='⏸ Pausa'; pb.classList.remove('paused'); }
 }
 
 // ════════════════════════════════
